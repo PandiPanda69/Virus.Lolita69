@@ -1,2 +1,9 @@
 *.pyc
 .*
+*.sw*
+antivirus/autom4te.cache
+antivirus/bin
+antivirus/*.log
+antivirus/*/*.log
+antivirus/*/*.o
+antivirus/*/*.deps

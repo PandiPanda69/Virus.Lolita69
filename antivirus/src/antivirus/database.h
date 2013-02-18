@@ -26,10 +26,8 @@ namespace antivirus
 			unsigned char* _key;
 			size_t _key_length;
 
-			void _decrypt_content(unsigned char* content, size_t length);
-
-			
-			
+			void _decrypt_content(unsigned char* content, size_t length) const;
+			bool _parse_content(unsigned char* content);
 	};
 }
 

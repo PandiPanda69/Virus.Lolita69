@@ -45,7 +45,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am___top_builddir__bin_antivirus_OBJECTS = main.$(OBJEXT) \
-	core.$(OBJEXT) database.$(OBJEXT)
+	core.$(OBJEXT) database.$(OBJEXT) filereader.$(OBJEXT) \
+	filedata.$(OBJEXT)
 __top_builddir__bin_antivirus_OBJECTS =  \
 	$(am___top_builddir__bin_antivirus_OBJECTS)
 __top_builddir__bin_antivirus_LDADD = $(LDADD)
@@ -161,7 +162,9 @@ top_srcdir = ../..
 __top_builddir__bin_antivirus_SOURCES = \
 	main.cpp \
 	core.cpp core.h \
-	database.cpp database.h
+	database.cpp database.h \
+	filereader.cpp filereader.h \
+	filedata.cpp filedata.h
 
 all: all-am
 
@@ -249,6 +252,8 @@ distclean-compile:
 
 include ./$(DEPDIR)/core.Po
 include ./$(DEPDIR)/database.Po
+include ./$(DEPDIR)/filedata.Po
+include ./$(DEPDIR)/filereader.Po
 include ./$(DEPDIR)/main.Po
 
 .cpp.o:

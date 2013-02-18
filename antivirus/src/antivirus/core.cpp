@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "core.h"
+#include "filereader.h"
 
 namespace antivirus
 {
@@ -30,6 +31,17 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::perform_static_check(const std::string& filename)
 	{
+		FileReader reader(filename);
+
+		try {
+			reader.read();
+		}
+		catch(FileReaderException ex)
+		{
+			cerr << ex.what() << endl;
+			return E_FAILED;
+		}
+
 		return E_FAILED;
 	}
 

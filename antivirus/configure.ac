@@ -19,6 +19,8 @@ dnl AC_CHECK_HEADERS([log4cplus/logger.h], , AC_MSG_ERROR("Log4Cplus headers not
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	src/antivirus/Makefile
+	src/database_packer/Makefile
 	])
 
 AC_OUTPUT

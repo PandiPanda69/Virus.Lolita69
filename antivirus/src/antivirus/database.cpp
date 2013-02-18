@@ -58,7 +58,12 @@ namespace antivirus
 		_decrypt_content(content, length);
 
 		// Add signatures into database
-		return _parse_content(content);
+		_parse_content(content);
+
+		// Release memory
+		delete [] content;
+
+		return true;
 	}
 
 	/**
@@ -78,9 +83,8 @@ namespace antivirus
 	* Populate database from plain text.
 	* Format must respect i18n standard : key=value
 	* @param content Content to be parsed
-	* @return True if everything went ok, false otherwise
 	*/
-	bool Database::_parse_content(unsigned char* content)
+	void Database::_parse_content(unsigned char* content)
 	{
 		string original((const char*) content);
 		bool must_exit = false;
@@ -122,7 +126,5 @@ namespace antivirus
 			}
 
 		} while( must_exit );
-
-		return true;
 	}
 }

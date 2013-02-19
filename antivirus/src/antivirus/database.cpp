@@ -67,6 +67,57 @@ namespace antivirus
 	}
 
 	/**
+        * Read database appended at the end of the application binary
+        * @return True if database has been read, false otherwise
+	*/
+	bool Database::readAppendedData()
+	{
+		extern std::string APP_NAME;
+
+		// Open the current running application
+		std::ifstream stream(APP_NAME.c_str(), std::ios_base::binary);
+		if(stream.is_open() == false)
+			return false;		
+
+		// Get theorical end of file using a marker written at the EoF by the injector
+		size_t size_length = sizeof(size_t);
+		size_t antivirus_length;
+
+		stream.seekg(-size_length, std::ios::end);
+		stream.read((char*) &antivirus_length, size_length);
+
+		// Determine database size, determining current app length, and applying the simple formula:
+		// db_size = total_app_len - antivirus_length - size_length
+		size_t current_length;
+
+		stream.seekg(0, std::ios::end);
+		current_length = stream.tellg();
+
+		size_t database_length = current_length - antivirus_length - size_length;
+
+		// Memory allocation
+		unsigned char* database_content = new unsigned char[database_length];
+
+		// Places cursor at the theorical end to read database (do not re-read length at the end)
+		stream.seekg(antivirus_length, std::ios::beg);
+		stream.read((char*) database_content, database_length);
+
+		stream.close();
+
+		// Decrypt file content
+		_decrypt_content(database_content, database_length);
+
+		// Add signatures into database
+		_parse_content(database_content);
+
+
+		// Release memory
+		delete [] database_content;
+
+		return true;
+	}
+
+	/**
 	* Decrypt database content
 	* @param content Content to be decrypted
 	* @param length Length of the passed content

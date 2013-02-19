@@ -10,7 +10,20 @@ namespace antivirus
 	*/
 	Core::Core()
 	{
-		bool res = _database.read("signatures.db"); // TODO Let ppl configures it
+		bool res = _database.readAppendedData();
+		if( res == false )
+		{
+			std::cerr << "Cannot read database." << std::endl;	
+		}
+	}
+
+	/**
+	* Constructor allowing user to specify database_file
+	* @param database_file	File to be used as database
+	*/
+	Core::Core(const std::string& database_file)
+	{
+		bool res = _database.read(database_file);
 		if( res == false )
 		{
 			std::cerr << "Cannot read database." << std::endl;	

@@ -14,6 +14,7 @@ namespace antivirus
 	{
 		public:
 			Core();
+			Core(const std::string& database_filename);
 			virtual ~Core();
 
 			enum E_RETURN_CODE

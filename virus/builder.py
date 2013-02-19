@@ -1,16 +1,19 @@
 import marshal
 import base64
 import zlib
+import imp
+
 import byteplay
 from obfuscation import obfuscate
 import xor_layer
+
 
 # ------------- GENERATING PAYLOAD DATA ---------------
 payload_f = open("payload.py", "r")
 payload = payload_f.read()
 payload_f.close()
 payload = byteplay.Code.from_code(compile(payload, "a", "exec"))
-payload.code = payload.code[:-2]
+payload.code = payload.code[:-1]
 for i, instr in enumerate(payload.code):
     if instr[0] == byteplay.SetLineno:
         payload.code.pop(i)
@@ -45,6 +48,6 @@ for i in range(42):
 
 lolita_f = open("lolita.final.pyc", "wb")
 
-lolita_f.write("\x03\xf3\r\n)\xb9\x1bQ")
+lolita_f.write(imp.get_magic() + ")\xb9\x1bQ")
 lolita_f.write(lolita)
 lolita_f.close()

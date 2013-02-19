@@ -4457,7 +4457,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/antivirus/Makefile src/database_packer/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/antivirus/Makefile src/database_packer/Makefile src/database_injector/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5214,6 +5214,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/antivirus/Makefile") CONFIG_FILES="$CONFIG_FILES src/antivirus/Makefile" ;;
     "src/database_packer/Makefile") CONFIG_FILES="$CONFIG_FILES src/database_packer/Makefile" ;;
+    "src/database_injector/Makefile") CONFIG_FILES="$CONFIG_FILES src/database_injector/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

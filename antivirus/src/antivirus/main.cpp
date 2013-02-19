@@ -7,6 +7,9 @@ using namespace std;
 
 namespace antivirus
 {
+	// Application name
+	string APP_NAME;
+
 	/**
 	* Display how to use the app
 	* @param filename Executable name
@@ -46,12 +49,14 @@ void print_check_result(antivirus::Core::E_RETURN_CODE res)
 */
 int main(int argc, char** argv)
 {
-	// Check arguments count
-	if( argc != 2 )
+	// Check arguments count (the 3rd parameters allow to specify an external signatures db
+	if( argc < 2 || argc > 3)
 	{
 		antivirus::usage(argv[0]);
 		return 1;
 	}
+
+	antivirus::APP_NAME = argv[0];
 
 	// Check passed file exists
 	ifstream file(argv[1]);
@@ -65,14 +70,23 @@ int main(int argc, char** argv)
 
 	// Initialize antivirus and run checks
 	antivirus::Core::E_RETURN_CODE res;
-	antivirus::Core core;
+	antivirus::Core* core;
 
-	res = core.perform_static_check(argv[1]);
+	// If an external database has been specified
+	if( argc == 3 )
+		core = new antivirus::Core(argv[2]);
+	else
+		core = new antivirus::Core;
+
+	res = core->perform_static_check(argv[1]);
 	print_check_result(res);
 
 
-	// res = core.perform_dynamic_check(argv[1]);
+	// res = core->perform_dynamic_check(argv[1]);
 	// print_check_result(res);
+
+	// Release memory
+	delete core;
 
 	return 0;
 }

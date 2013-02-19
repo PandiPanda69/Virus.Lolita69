@@ -1,1 +1,1 @@
-SUBDIRS=antivirus database_packer
+SUBDIRS=antivirus database_packer database_injector

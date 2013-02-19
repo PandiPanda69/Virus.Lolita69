@@ -16,6 +16,7 @@ namespace antivirus
 			Database();
 			virtual ~Database();
 
+			bool readAppendedData();
 			bool read(const string& filename);
 
 			inline const multimap<string, string>& getSignatures() { return _signatures; }

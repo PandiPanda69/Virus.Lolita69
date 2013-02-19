@@ -21,6 +21,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	src/antivirus/Makefile
 	src/database_packer/Makefile
+	src/database_injector/Makefile
 	])
 
 AC_OUTPUT

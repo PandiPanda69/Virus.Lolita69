@@ -83,7 +83,11 @@ namespace antivirus
 		size_t size_length = sizeof(size_t);
 		size_t antivirus_length;
 
-		stream.seekg(-size_length, std::ios::end);
+		stream.seekg(0, std::ios::end);
+		std::cout << stream.tellg() << std::endl;
+		stream.seekg(-((signed int) size_length), std::ios::end);
+		std::cout << stream.tellg() << std::endl;
+
 		stream.read((char*) &antivirus_length, size_length);
 
 		// Determine database size, determining current app length, and applying the simple formula:
@@ -96,6 +100,7 @@ namespace antivirus
 		size_t database_length = current_length - antivirus_length - size_length;
 
 		// Memory allocation
+		std::cout << APP_NAME << " / " << database_length << " = " << current_length << " - " << antivirus_length << " - " << size_length << std::endl;
 		unsigned char* database_content = new unsigned char[database_length];
 
 		// Places cursor at the theorical end to read database (do not re-read length at the end)

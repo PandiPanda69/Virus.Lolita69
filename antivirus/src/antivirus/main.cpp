@@ -71,8 +71,8 @@ int main(int argc, char** argv)
 	print_check_result(res);
 
 
-	res = core.perform_dynamic_check(argv[1]);
-	print_check_result(res);
+	// res = core.perform_dynamic_check(argv[1]);
+	// print_check_result(res);
 
 	return 0;
 }

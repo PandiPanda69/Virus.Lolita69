@@ -61,6 +61,8 @@ namespace antivirus
 	*/
 	bool FileData::check_signature(const std::string& signature)
 	{
-		return false;
+		boost::cmatch what;
+
+		return boost::regex_match( _content.c_str(), what, boost::regex( signature ) );
 	}
 }

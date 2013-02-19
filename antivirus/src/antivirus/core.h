@@ -3,6 +3,7 @@
 
 #include <string>
 #include "database.h"
+#include "filedata.h"
 
 namespace antivirus
 {
@@ -27,6 +28,8 @@ namespace antivirus
 
 		private:
 			Database _database;
+
+			bool _check_signatures(FileData* data);
 	};
 }
 

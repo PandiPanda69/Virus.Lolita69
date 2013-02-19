@@ -31,6 +31,7 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::perform_static_check(const std::string& filename)
 	{
+		// Read file content
 		FileReader reader(filename);
 
 		try {
@@ -42,7 +43,10 @@ namespace antivirus
 			return E_FAILED;
 		}
 
-		return E_FAILED;
+		// Check if signatures matches
+		bool matches = _check_signatures(reader.getFileData());
+
+		return matches ? E_VIRUS_SPOTTED : E_LOOKS_CLEAN;
 	}
 
 	/**
@@ -53,5 +57,26 @@ namespace antivirus
 	Core::E_RETURN_CODE Core::perform_dynamic_check(const std::string& filename)
 	{
 		return E_FAILED;
+	}
+
+	/**
+	* Check if the file matches with the various signatures contained in database.
+	* @param data	Data of the file to check
+	* @return True if one matches, false otherwise
+	*/
+	bool Core::_check_signatures(FileData* data)
+	{
+		std::multimap<string, string> database;
+		std::multimap<string, string>::const_iterator it;
+
+		database = _database.getSignatures();
+
+		bool matched = false;
+		for( it = database.begin(); it != database.end() && !matched; it++ )
+		{
+			matched = data->check_signature((*it).second);
+		}
+		
+		return matched;
 	}
 }

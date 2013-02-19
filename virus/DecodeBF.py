@@ -1,20 +1,6 @@
 import sys
 
-table = range(10,260,20)
-ptr = 0
-code = sys.stdin.read()
-key = code[:5]
-code = code[5:]
-
-for opcode in code:
-	if opcode == key[0]:
-		ptr -= 1
-	if opcode == key[1]:
-		ptr += 1
-	if opcode == key[2]:
-		table[ptr] = table[ptr] + 1
-	if opcode == key[3]:
-		table[ptr] = table[ptr] - 1
-	if opcode == key[4]:
-		sys.stdout.write("%c"%table[ptr])
+t,p,c,h = range(10,260,20),0,sys.stdin.read(),["p-=1","p+=1","t[p]+=1","t[p]-=1","sys.stdout.write('%c'%t[p])"]
+k=[compile(x,'a','exec') for x in h]
+[r for r in[eval(k[i])  for o in c[5:] for i in range(5)if o==c[i]] for r in c[5:]]
 		

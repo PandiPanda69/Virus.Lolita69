@@ -95,15 +95,11 @@ namespace antivirus
 
 		do
 		{
-			// Find the next =. If not found, line mays be empty or is invalid. Skip it!
+			// Find the next =. If not found, no interesting lines left so exits
 			next_eq = original.find( '=', next_lf );
 			if( next_eq == string::npos )
 			{
-				next_lf = original.find( '\n', next_lf );
-
-				// Hmmm... it's the end of file so exit
-				if( next_lf == string::npos )
-					must_exit = true;
+				must_exit = true;
 			}
 			else
 			{
@@ -123,8 +119,12 @@ namespace antivirus
 	
 				// Push it into the multimap!
 				_signatures.insert( pair<string, string>( key, value ) );
+
+				// Why adding 1? Since next_lf currently refers to the last '\n' found, 
+				// increments it allows to start seeking in the next line
+				next_lf++;
 			}
 
-		} while( must_exit );
+		} while( !must_exit );
 	}
 }

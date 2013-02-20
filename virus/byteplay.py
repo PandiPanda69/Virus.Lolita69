@@ -787,4 +787,60 @@ class Code(object):
                               self.filename, self.name, self.firstlineno, co_lnotab,
                               co_freevars, co_cellvars)
 
+def printcodelist(codelist, to=sys.stdout):
+    """Get a code list. Print it nicely."""
+
+    labeldict = {}
+    pendinglabels = []
+    for i, (op, arg) in enumerate(codelist):
+        if isinstance(op, Label):
+            pendinglabels.append(op)
+        elif op is SetLineno:
+            pass
+        else:
+            while pendinglabels:
+                labeldict[pendinglabels.pop()] = i
+
+    lineno = None
+    islabel = False
+    for i, (op, arg) in enumerate(codelist):
+        if op is SetLineno:
+            lineno = arg
+            print >> to
+            continue
+
+        if isinstance(op, Label):
+            islabel = True
+            continue
+
+        if lineno is None:
+            linenostr = ''
+        else:
+            linenostr = str(lineno)
+            lineno = None
+
+        if islabel:
+            islabelstr = '>>'
+            islabel = False
+        else:
+            islabelstr = ''
+
+        if op in hasconst:
+            argstr = repr(arg)
+        elif op in hasjump:
+            try:
+                argstr = 'to ' + str(labeldict[arg])
+            except KeyError:
+                argstr = repr(arg)
+        elif op in hasarg:
+            argstr = str(arg)
+        else:
+            argstr = ''
+
+        print >> to, '%3s     %2s %4d %-20s %s' % (
+            linenostr,
+            islabelstr,
+            i,
+            op,
+            argstr)
 

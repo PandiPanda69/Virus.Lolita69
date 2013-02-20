@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+signature = "PY_2.6"
 
 import zlib
 import base64
@@ -23,3 +24,4 @@ demarshal = marshal.loads(decompress)
 # exec
 exec demarshal
 
+signature = "PY_2.6"

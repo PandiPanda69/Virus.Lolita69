@@ -7,7 +7,6 @@ f.close()
 
 payload_f = open("payload.py", "r")
 builder = builder.replace("__PAYLOAD_PY__", b64encode(payload_f.read()))
-builder = builder.replace("__PAYLOAD_PLACE_HOLDER__", b64encode(payload_f.read()))
 payload_f.close()
 
 byteplay_f = open("byteplay.py", "r")

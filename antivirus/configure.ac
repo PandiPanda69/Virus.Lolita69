@@ -11,6 +11,8 @@ then
 fi
 
 AC_HAVE_LIBRARY(boost_regex, , AC_MSG_ERROR("Library Boost-Regex not found."))
+AC_HAVE_LIBRARY(pthread, , AC_MSG_ERROR("Library pthread not found."))
+AC_HAVE_LIBRARY(zip, , AC_MSG_ERROR("Library zip not found."))
 dnl AC_HAVE_LIBRARY(log4cplus, , AC_MSG_ERROR("Library Log4CPlus not found."))
 
 AC_CHECK_HEADERS([boost/regex.hpp], , AC_MSG_ERROR("Boost-Regex headers not found."))

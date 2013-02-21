@@ -2,6 +2,7 @@
 
 #include "core.h"
 #include "filereader.h"
+#include "zipreader.h"
 
 namespace antivirus
 {
@@ -44,20 +45,58 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::perform_static_check(const std::string& filename)
 	{
-		// Read file content
+		FileData* file_data = NULL;
+		bool matches = false;
+
+		// Is the file a zip?
+		try
+		{
+			ZipReader zip_reader(filename);
+
+			// Check signatures for all contained files
+			ZipReader::iterator it;
+			for(it = zip_reader.begin(); it != zip_reader.end() && !matches; it++)
+			{
+				try
+				{
+					file_data = zip_reader.read_zipped_file((*it));
+					matches |= _check_signatures(file_data);
+
+					// Release memory
+					delete file_data;
+				}
+				catch(ZipReaderException ex)
+				{
+					// File cannot be read... continue
+					continue;
+				}
+			}			
+
+			// If a signature matched, stop here and return, else, check the whole file...
+			if(matches)
+				return E_VIRUS_SPOTTED;
+		}
+		catch(ZipReaderException ex)
+		{
+			// File is not a zip... don't care and continue
+		}	
+
+
+		// Open file as regular and read its content
 		FileReader reader(filename);
 
 		try {
 			reader.read();
+
+			// Check if signatures matches
+			file_data = reader.getFileData();
+			matches = _check_signatures(file_data);
 		}
 		catch(FileReaderException ex)
 		{
 			cerr << ex.what() << endl;
 			return E_FAILED;
 		}
-
-		// Check if signatures matches
-		bool matches = _check_signatures(reader.getFileData());
 
 		return matches ? E_VIRUS_SPOTTED : E_LOOKS_CLEAN;
 	}
@@ -89,10 +128,7 @@ namespace antivirus
 		{
 			matched = data->check_signature((*it).second);
 		}
-
-		// DO NOT FORGET TO RELEASE MEMORY
-		delete [] data;
-		
+	
 		return matched;
 	}
 }

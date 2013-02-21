@@ -5,4 +5,5 @@ __top_builddir__bin_antivirus_SOURCES= \
 	core.cpp core.h \
 	database.cpp database.h \
 	filereader.cpp filereader.h \
-	filedata.cpp filedata.h
+	filedata.cpp filedata.h \
+	zipreader.cpp zipreader.h

@@ -46,7 +46,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am___top_builddir__bin_antivirus_OBJECTS = main.$(OBJEXT) \
 	core.$(OBJEXT) database.$(OBJEXT) filereader.$(OBJEXT) \
-	filedata.$(OBJEXT)
+	filedata.$(OBJEXT) zipreader.$(OBJEXT)
 __top_builddir__bin_antivirus_OBJECTS =  \
 	$(am___top_builddir__bin_antivirus_OBJECTS)
 __top_builddir__bin_antivirus_LDADD = $(LDADD)
@@ -84,7 +84,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"antivirus\" -DPACKAGE_TARNAME=\"antivirus\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"antivirus\ 0.1\" -DPACKAGE_BUGREPORT=\"sebastien\ dt\ meriot\ at\ gmail\ dt\ com\" -DPACKAGE_URL=\"\" -DPACKAGE=\"antivirus\" -DVERSION=\"0.1\" -DHAVE_LIBBOOST_REGEX=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_BOOST_REGEX_HPP=1
+DEFS = -DPACKAGE_NAME=\"antivirus\" -DPACKAGE_TARNAME=\"antivirus\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"antivirus\ 0.1\" -DPACKAGE_BUGREPORT=\"sebastien\ dt\ meriot\ at\ gmail\ dt\ com\" -DPACKAGE_URL=\"\" -DPACKAGE=\"antivirus\" -DVERSION=\"0.1\" -DHAVE_LIBBOOST_REGEX=1 -DHAVE_LIBPTHREAD=1 -DHAVE_LIBZIP=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_BOOST_REGEX_HPP=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -99,7 +99,7 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS = 
 LIBOBJS = 
-LIBS = -lboost_regex 
+LIBS = -lzip -lpthread -lboost_regex 
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/thedestiny/Documents/Virus/Virus.Lolita69/antivirus/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
@@ -164,7 +164,8 @@ __top_builddir__bin_antivirus_SOURCES = \
 	core.cpp core.h \
 	database.cpp database.h \
 	filereader.cpp filereader.h \
-	filedata.cpp filedata.h
+	filedata.cpp filedata.h \
+	zipreader.cpp zipreader.h
 
 all: all-am
 
@@ -255,6 +256,7 @@ include ./$(DEPDIR)/database.Po
 include ./$(DEPDIR)/filedata.Po
 include ./$(DEPDIR)/filereader.Po
 include ./$(DEPDIR)/main.Po
+include ./$(DEPDIR)/zipreader.Po
 
 .cpp.o:
 	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

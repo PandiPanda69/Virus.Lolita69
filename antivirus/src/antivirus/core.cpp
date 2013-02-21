@@ -89,6 +89,9 @@ namespace antivirus
 		{
 			matched = data->check_signature((*it).second);
 		}
+
+		// DO NOT FORGET TO RELEASE MEMORY
+		delete [] data;
 		
 		return matched;
 	}

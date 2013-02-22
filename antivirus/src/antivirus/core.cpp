@@ -4,6 +4,8 @@
 #include "filereader.h"
 #include "zipreader.h"
 
+#include "debug.h"
+
 namespace antivirus
 {
 	/**
@@ -48,10 +50,13 @@ namespace antivirus
 		FileData* file_data = NULL;
 		bool matches = false;
 
+		TRACE("Static check.");
+
 		// Is the file a zip?
 		try
 		{
 			ZipReader zip_reader(filename);
+			TRACE("Zip file spotted - Checking all files");
 
 			// Check signatures for all contained files
 			ZipReader::iterator it;
@@ -64,10 +69,14 @@ namespace antivirus
 
 					// Release memory
 					delete file_data;
+
+					if( matches )
+						TRACE((*it));
 				}
 				catch(ZipReaderException ex)
 				{
 					// File cannot be read... continue
+					TRACE("ZipReaderException occured.");
 					continue;
 				}
 			}			
@@ -79,6 +88,7 @@ namespace antivirus
 		catch(ZipReaderException ex)
 		{
 			// File is not a zip... don't care and continue
+			TRACE("Not a zip file.");
 		}	
 
 
@@ -87,6 +97,7 @@ namespace antivirus
 
 		try {
 			reader.read();
+			TRACE("Read regular file");
 
 			// Check if signatures matches
 			file_data = reader.getFileData();
@@ -127,6 +138,9 @@ namespace antivirus
 		for( it = database.begin(); it != database.end() && !matched; it++ )
 		{
 			matched = data->check_signature((*it).second);
+
+			if(matched) 
+				TRACE((*it).first.c_str());
 		}
 	
 		return matched;

@@ -12,7 +12,7 @@ def obfuscate(marshalled, layer=no_op_layer):
     compressed = compress(marshalled)
 
     # crypt step
-    crypted = layer.crypt(compressed)
+    crypted = layer.a(compressed)
 
     # B64 step
     b64 = b64encode(crypted)

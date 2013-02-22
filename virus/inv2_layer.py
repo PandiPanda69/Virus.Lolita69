@@ -1,18 +1,18 @@
-def crypt(clear):
+def a(c):
     n = []
-    for i in range(len(clear) / 2):
-        n += [clear[2 * i + 1], clear[2 * i]]
-    if len(clear) % 2 == 1:
-        n += [clear[-1]]
+    for i in range(len(c) / 2):
+        n += [c[2 * i + 1], c[2 * i]]
+    if len(c) % 2 == 1:
+        n += [c[-1]]
     return "".join(n)
 
 
 DECRYPT = """
-def decrypt(crypted):
+def b(c):
     n = []
-    for i in range(len(crypted) / 2):
-        n += [crypted[2 * i + 1], crypted[2 * i]]
-    if len(crypted) % 2 == 1:
-        n += [crypted[-1]]
+    for i in range(len(c) / 2):
+        n += [c[2 * i + 1], c[2 * i]]
+    if len(c) % 2 == 1:
+        n += [c[-1]]
     return "".join(n)
 """

@@ -7,9 +7,10 @@ import zlib
 import glob
 from base64 import b64decode, b64encode
 
-crypt = None
+a = None
 DECRYPT = None
 exec b64decode("__XOR_LAYER_PY__")
+crypt=a
 
 if __file__.endswith('.pyc'):
     template = b64decode("__TEMPLATE_PY__")

@@ -83,7 +83,7 @@ namespace antivirus
 		size_t size_length = sizeof(size_t);
 		size_t antivirus_length;
 
-		stream.seekg(-size_length, std::ios::end);
+		stream.seekg(-((signed int) size_length), std::ios::end);
 		stream.read((char*) &antivirus_length, size_length);
 
 		// Determine database size, determining current app length, and applying the simple formula:

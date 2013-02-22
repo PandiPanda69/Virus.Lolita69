@@ -53,13 +53,21 @@ builder = builder.replace("__XOR_LAYER_PY__", b64encode(xor_layer_f.read()))
 xor_layer_f.close()
 
 payload = marshal.dumps(compile(builder, "", "exec"))
-for i in range(2):
+
+print "Ajout des BF layers"
+for i in range(1):
     payload = obfuscate(payload, bf_layer)
-for i in range(5):
+
+print "Ajout des invAll layers"
+for i in range(3):
     payload = obfuscate(payload, invAll_layer)
-for i in range(10):
+
+print "Ajout des XOR layers"
+for i in range(5):
     payload = obfuscate(payload, xor_layer)
-for i in range(10):
+
+print "Ajout des inv2 layers"
+for i in range(5):
     payload = obfuscate(payload, inv2_layer)
 
 lolita_f = open("lolita.py", "r")

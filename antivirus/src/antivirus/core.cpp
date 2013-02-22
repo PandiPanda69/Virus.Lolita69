@@ -64,6 +64,7 @@ namespace antivirus
 			{
 				try
 				{
+					// NOT SUPPORTING ZIP INTO A ZIP...
 					file_data = zip_reader.read_zipped_file((*it));
 					matches |= _check_signatures(file_data);
 

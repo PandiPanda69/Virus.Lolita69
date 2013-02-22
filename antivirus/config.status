@@ -666,14 +666,14 @@ S["INSTALL_PROGRAM"]="${INSTALL}"
 S["target_alias"]=""
 S["host_alias"]=""
 S["build_alias"]=""
-S["LIBS"]="-lboost_regex "
+S["LIBS"]="-lzip -lpthread -lboost_regex "
 S["ECHO_T"]=""
 S["ECHO_N"]="-n"
 S["ECHO_C"]=""
 S["DEFS"]="-DPACKAGE_NAME=\\\"antivirus\\\" -DPACKAGE_TARNAME=\\\"antivirus\\\" -DPACKAGE_VERSION=\\\"0.1\\\" -DPACKAGE_STRING=\\\"antivirus\\ 0.1\\\" -DPACKAGE_BUGREPORT=\\\"seb"\
-"astien\\ dt\\ meriot\\ at\\ gmail\\ dt\\ com\\\" -DPACKAGE_URL=\\\"\\\" -DPACKAGE=\\\"antivirus\\\" -DVERSION=\\\"0.1\\\" -DHAVE_LIBBOOST_REGEX=1 -DSTDC_HEADERS=1 -DHAV"\
-"E_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -"\
-"DHAVE_UNISTD_H=1 -DHAVE_BOOST_REGEX_HPP=1"
+"astien\\ dt\\ meriot\\ at\\ gmail\\ dt\\ com\\\" -DPACKAGE_URL=\\\"\\\" -DPACKAGE=\\\"antivirus\\\" -DVERSION=\\\"0.1\\\" -DHAVE_LIBBOOST_REGEX=1 -DHAVE_LIBPTHREAD=1 -D"\
+"HAVE_LIBZIP=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DH"\
+"AVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_BOOST_REGEX_HPP=1"
 S["mandir"]="${datarootdir}/man"
 S["localedir"]="${datarootdir}/locale"
 S["libdir"]="${exec_prefix}/lib"

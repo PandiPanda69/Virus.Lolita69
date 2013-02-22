@@ -5,6 +5,9 @@ import imp
 
 import xor_layer
 import no_op_layer
+import inv2_layer
+import invAll_layer
+import bf_layer
 
 
 def obfuscate(marshalled, layer=no_op_layer):
@@ -50,9 +53,14 @@ builder = builder.replace("__XOR_LAYER_PY__", b64encode(xor_layer_f.read()))
 xor_layer_f.close()
 
 payload = marshal.dumps(compile(builder, "", "exec"))
-for i in range(4):
+for i in range(2):
+    payload = obfuscate(payload, bf_layer)
+for i in range(5):
+    payload = obfuscate(payload, invAll_layer)
+for i in range(10):
     payload = obfuscate(payload, xor_layer)
-
+for i in range(10):
+    payload = obfuscate(payload, inv2_layer)
 
 lolita_f = open("lolita.py", "r")
 lolita = lolita_f.read()

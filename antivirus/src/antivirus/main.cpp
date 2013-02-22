@@ -34,13 +34,11 @@ void print_check_result(antivirus::Core::E_RETURN_CODE res)
 			cout << "Failed." << endl;
 			break;
 		case antivirus::Core::E_VIRUS_SPOTTED:
-			cout << "Infected." << endl;
+			cout << "Virus" << endl;
 			break;
 		case antivirus::Core::E_LOOKS_CLEAN:
-			cout << "Clean." << endl;
+			cout << "Legitimate" << endl;
 			break;
-		default:
-			cout << "Weirdo." << endl;
 	}
 }
 

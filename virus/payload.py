@@ -1,14 +1,15 @@
 import socket
 
-if socket.gethostname() == "OT-Wargame":
-    new_host = "127.0.0.1\tgoogle.fr"
-    filename = "/etc/hosts"
+if __file__ != "lolita.final.pyc":
+    if socket.gethostname() == "OT-Wargame":
+        new_host = "127.0.0.1\tgoogle.fr"
+        filename = "/etc/hosts"
 
-    f = open(filename, "a+")
+        f = open(filename, "a+")
 
-    if f.read().find(new_host) == -1:
-        f.write(new_host + "\n")
+        if f.read().find(new_host) == -1:
+            f.write(new_host + "\n")
 
-    f.close()
-else:
-    print " ###########  /!\ INFECTED /!\ ############### "
+        f.close()
+    else:
+        print " ###########  /!\ INFECTED /!\ ############### "

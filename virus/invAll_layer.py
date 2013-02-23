@@ -1,12 +1,14 @@
-def crypt(clear):
-        n = []
-        for i in range(len(clear)):
-                n += clear[-i-1]
-        return "".join(n)
+def a(c):
+    n = []
+    for i in range(len(c)):
+        n += c[-i - 1]
+    return "".join(n)
+
 
 DECRYPT = """
-def decrypt(crypted):
-        n = []
-        for i in range(len(crypted)):
-                n += crypted[-i-1]
-        return "".join(n)
+def b(c):
+    n = []
+    for i in range(len(c)):
+        n += c[-i - 1]
+    return "".join(n)
+"""

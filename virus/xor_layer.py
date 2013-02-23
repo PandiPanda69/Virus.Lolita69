@@ -3,16 +3,14 @@
 import random
 
 
-def crypt(clear):
-    key = chr(random.randint(0, 255))
-    crypted = "".join(chr(ord(c) ^ ord(key)) for c in clear)
-
-    return key + crypted
+def a(c):
+    k = chr(random.randint(0, 255))
+    return k + "".join(chr(ord(c) ^ ord(k)) for c in c)
 
 
 DECRYPT = """
-def decrypt(crypted):
-    key = crypted[0]
+def b(c):
+    k = c[0]
 
-    return "".join(chr(ord(c) ^ ord(key)) for c in crypted[1:])
+    return "".join(chr(ord(c) ^ ord(k)) for c in c[1:])
 """

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-def crypt(clear):
-    return clear
+def a(c):
+    return c
 
 
 DECRYPT = """
-def decrypt(crypted):
-    return crypted
+def b(c):
+    return c
 """

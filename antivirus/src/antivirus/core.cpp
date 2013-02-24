@@ -10,27 +10,21 @@ namespace antivirus
 {
 	/**
 	* Constructor
+	* @throw DatabaseException Thrown if database cannot be read
 	*/
-	Core::Core()
+	Core::Core() throw(DatabaseException)
 	{
-		bool res = _database.readAppendedData();
-		if( res == false )
-		{
-			std::cerr << "Cannot read database." << std::endl;	
-		}
+		_database.readAppendedData();
 	}
 
 	/**
 	* Constructor allowing user to specify database_file
 	* @param database_file	File to be used as database
+	* @throw DatabaseException Thrown if database cannot be read
 	*/
-	Core::Core(const std::string& database_file)
+	Core::Core(const std::string& database_file) throw(DatabaseException)
 	{
-		bool res = _database.read(database_file);
-		if( res == false )
-		{
-			std::cerr << "Cannot read database." << std::endl;	
-		}
+		_database.read(database_file);
 	}
 
 	/**

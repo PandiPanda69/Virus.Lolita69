@@ -2,11 +2,19 @@
 #define __ANTIVIR_DATABASE_H__
 
 #include <map>
+#include <exception>
 
 using namespace std;
 
 namespace antivirus
 {
+	class DatabaseException: public exception
+	{
+		public:
+			DatabaseException() throw() {}
+			~DatabaseException() throw() {}
+	};
+
 	/**
 	* Class representing virus signatures database
 	*/
@@ -16,8 +24,8 @@ namespace antivirus
 			Database();
 			virtual ~Database();
 
-			bool readAppendedData();
-			bool read(const string& filename);
+			void readAppendedData() throw(DatabaseException);
+			void read(const string& filename) throw(DatabaseException);
 
 			inline const multimap<string, string>& getSignatures() { return _signatures; }
 

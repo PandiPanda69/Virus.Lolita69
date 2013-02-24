@@ -13,8 +13,8 @@ namespace antivirus
 	class Core
 	{
 		public:
-			Core();
-			Core(const std::string& database_filename);
+			Core() throw(DatabaseException);
+			Core(const std::string& database_filename) throw(DatabaseException);
 			virtual ~Core();
 
 			enum E_RETURN_CODE

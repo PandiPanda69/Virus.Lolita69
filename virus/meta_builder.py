@@ -13,7 +13,7 @@ from minify import minify
 
 def obfuscate(marshalled, layer=no_op_layer):
     # compress step
-    compressed = compress(marshalled)
+    compressed = compress(marshalled, 9)
 
     # crypt step
     crypted = layer.a(compressed)

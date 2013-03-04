@@ -8,6 +8,7 @@ import no_op_layer
 import inv2_layer
 import invAll_layer
 import bf_layer
+import xor_light_layer
 from minify import minify
 
 
@@ -31,6 +32,23 @@ def obfuscate(marshalled, layer=no_op_layer):
         template_compiled = compile(template, "", "exec")
     else:
         template_compiled = compile(minify(template), "", "exec")
+
+    # marshall step
+    return marshal.dumps(template_compiled)
+
+
+def obfuscate_light(marshalled, layer):
+    # crypt step
+    crypted = layer.a(marshalled)
+
+    hexed = to_hex(crypted)
+
+    # template injection step
+    template = open("template_light.py", "r").read()
+    template = template.replace("__PAYLOAD_PLACEHOLDER__", hexed)
+    template = template.replace("__DECRYPT_PLACEHOLDER__", layer.DECRYPT)
+
+    template_compiled = compile(minify(template), "", "exec")
 
     # marshall step
     return marshal.dumps(template_compiled)
@@ -73,6 +91,9 @@ for i in range(5):
 print "Ajout des inv2 layers"
 for i in range(5):
     payload = obfuscate(payload, inv2_layer)
+
+print "Ajout du XOR light layer"
+payload = obfuscate_light(payload, xor_light_layer)
 
 lolita_f = open("lolita.py", "r")
 lolita = lolita_f.read()

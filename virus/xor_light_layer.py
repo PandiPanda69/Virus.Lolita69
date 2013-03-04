@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import random
+
 
 def a(c):
-    return "".join(chr(ord(c) ^ 0x0A) for c in c)
+    k = chr(random.randint(0, 255))
+    return k + "".join(chr(ord(c) ^ ord(k)) for c in c)
 
 
 DECRYPT = """
 def b(c):
-    return "".join(chr(ord(c) ^ 0x0A) for c in c)
+    k = c[0]
+
+    return "".join(chr(ord(c) ^ ord(k)) for c in c[1:])
 """

@@ -69,11 +69,11 @@ byteplay_f = open("byteplay.py", "r")
 builder = builder.replace("__BYTEPLAY_PY__", to_hex(byteplay_f.read()))
 byteplay_f.close()
 
-template_f = open("template.py", "r")
+template_f = open("template_light.py", "r")
 builder = builder.replace("__TEMPLATE_PY__", to_hex(template_f.read()))
 template_f.close()
 
-xor_layer_f = open("xor_layer.py", "r")
+xor_layer_f = open("xor_light_layer.py", "r")
 builder = builder.replace("__XOR_LAYER_PY__", to_hex(xor_layer_f.read()))
 xor_layer_f.close()
 

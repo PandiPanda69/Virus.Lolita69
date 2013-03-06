@@ -1,6 +1,8 @@
 import marshal
 from zlib import compress
+from random import randint
 import imp
+import byteplay
 
 import xor_layer
 import no_op_layer
@@ -10,6 +12,20 @@ import bf_layer
 import xor_light_layer
 from minify import minify
 
+
+def noper(orig):
+    new_code = []
+    orig = byteplay.Code.from_code(orig)
+    code = list(orig.code)
+    
+    for opcode in list(code):
+        new_code.append(opcode)
+        for _ in range(randint(0, 2)):
+            new_code.append((byteplay.NOP, None))
+    
+    orig.code = new_code
+
+    return orig.to_code()
 
 def to_hex(s):
     return "\\x" + "\\x".join(c.encode("hex") for c in s)
@@ -105,7 +121,7 @@ lolita_f.close()
 payload_hex = to_hex(payload)
 
 lolita = lolita.replace("__FINAL_PLACEHOLDER__", payload_hex)
-lolita = marshal.dumps(compile(minify(lolita), "", "exec"))
+lolita = marshal.dumps(noper(compile(minify(lolita), "", "exec")))
 
 lolita_f = open("lolita.final.pyc", "wb")
 

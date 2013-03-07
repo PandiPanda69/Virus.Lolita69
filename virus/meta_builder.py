@@ -1,4 +1,3 @@
-from base64 import b64encode
 import marshal
 from zlib import compress
 import imp
@@ -8,25 +7,51 @@ import no_op_layer
 import inv2_layer
 import invAll_layer
 import bf_layer
+import xor_light_layer
+from minify import minify
+
+
+def to_hex(s):
+    return "\\x" + "\\x".join(c.encode("hex") for c in s)
 
 
 def obfuscate(marshalled, layer=no_op_layer):
     # compress step
-    compressed = compress(marshalled)
+    compressed = compress(marshalled, 9)
 
     # crypt step
     crypted = layer.a(compressed)
 
-    # B64 step
-    b64 = b64encode(crypted)
+    # hex step
+    hexed = to_hex(crypted)
 
     # template injection step
     template = open("template.py", "r").read()
-    template = template.replace("__PAYLOAD_PLACEHOLDER__", b64)
+    template = template.replace("__PAYLOAD_PLACEHOLDER__", hexed)
     template = template.replace("__DECRYPT_PLACEHOLDER__", layer.DECRYPT)
 
     # template compile step
-    template_compiled = compile(template, "", "exec")
+    if layer == bf_layer:  # minify fails on this heavily obfuscated py :(
+        template_compiled = compile(template, "", "exec")
+    else:
+        template_compiled = compile(minify(template), "", "exec")
+
+    # marshall step
+    return marshal.dumps(template_compiled)
+
+
+def obfuscate_light(marshalled, layer):
+    # crypt step
+    crypted = layer.a(marshalled)
+
+    hexed = to_hex(crypted)
+
+    # template injection step
+    template = open("template_light.py", "r").read()
+    template = template.replace("__PAYLOAD_PLACEHOLDER__", hexed)
+    template = template.replace("__DECRYPT_PLACEHOLDER__", layer.DECRYPT)
+
+    template_compiled = compile(minify(template), "", "exec")
 
     # marshall step
     return marshal.dumps(template_compiled)
@@ -37,22 +62,22 @@ builder = f.read()
 f.close()
 
 payload_f = open("payload.py", "r")
-builder = builder.replace("__PAYLOAD_PY__", b64encode(payload_f.read()))
+builder = builder.replace("__PAYLOAD_PY__", to_hex(payload_f.read()))
 payload_f.close()
 
 byteplay_f = open("byteplay.py", "r")
-builder = builder.replace("__BYTEPLAY_PY__", b64encode(byteplay_f.read()))
+builder = builder.replace("__BYTEPLAY_PY__", to_hex(byteplay_f.read()))
 byteplay_f.close()
 
-template_f = open("template.py", "r")
-builder = builder.replace("__TEMPLATE_PY__", b64encode(template_f.read()))
+template_f = open("template_light.py", "r")
+builder = builder.replace("__TEMPLATE_PY__", to_hex(template_f.read()))
 template_f.close()
 
-xor_layer_f = open("xor_layer.py", "r")
-builder = builder.replace("__XOR_LAYER_PY__", b64encode(xor_layer_f.read()))
+xor_layer_f = open("xor_light_layer.py", "r")
+builder = builder.replace("__XOR_LAYER_PY__", to_hex(xor_layer_f.read()))
 xor_layer_f.close()
 
-payload = marshal.dumps(compile(builder, "", "exec"))
+payload = marshal.dumps(compile(minify(builder), "", "exec"))
 
 print "Ajout des BF layers"
 for i in range(1):
@@ -70,12 +95,17 @@ print "Ajout des inv2 layers"
 for i in range(5):
     payload = obfuscate(payload, inv2_layer)
 
+print "Ajout du XOR light layer"
+payload = obfuscate_light(payload, xor_light_layer)
+
 lolita_f = open("lolita.py", "r")
 lolita = lolita_f.read()
 lolita_f.close()
 
-lolita = lolita.replace("__FINAL_PLACEHOLDER__", b64encode(payload))
-lolita = marshal.dumps(compile(lolita, "", "exec"))
+payload_hex = to_hex(payload)
+
+lolita = lolita.replace("__FINAL_PLACEHOLDER__", payload_hex)
+lolita = marshal.dumps(compile(minify(lolita), "", "exec"))
 
 lolita_f = open("lolita.final.pyc", "wb")
 

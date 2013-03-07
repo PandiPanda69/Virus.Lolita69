@@ -7,3 +7,6 @@ antivirus/*.log
 antivirus/*/*/*.log
 antivirus/*/*/*.o
 antivirus/*/*/*.deps
+antivirus/Makefile
+antivirus/src/Makefile
+antivirus/src/*/Makefile

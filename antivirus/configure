@@ -4740,13 +4740,12 @@ fi
 done
 
 
-for ac_header in boost/regex.hpp  boost/filesystem.hpp
+for ac_header in boost/regex.hpp
 do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "boost/regex.hpp" "ac_cv_header_boost_regex_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_regex_hpp" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+#define HAVE_BOOST_REGEX_HPP 1
 _ACEOF
 
 else
@@ -4754,6 +4753,7 @@ else
 fi
 
 done
+
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/antivirus/Makefile src/database_packer/Makefile src/database_injector/Makefile src/libc_hijack/Makefile"

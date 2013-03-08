@@ -46,7 +46,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am___top_builddir__bin_antivirus_OBJECTS = main.$(OBJEXT) \
 	core.$(OBJEXT) database.$(OBJEXT) filereader.$(OBJEXT) \
-	filedata.$(OBJEXT) zipreader.$(OBJEXT)
+	filedata.$(OBJEXT) zipreader.$(OBJEXT) sandbox.$(OBJEXT)
 __top_builddir__bin_antivirus_OBJECTS =  \
 	$(am___top_builddir__bin_antivirus_OBJECTS)
 __top_builddir__bin_antivirus_LDADD = $(LDADD)
@@ -165,7 +165,8 @@ __top_builddir__bin_antivirus_SOURCES = \
 	database.cpp database.h \
 	filereader.cpp filereader.h \
 	filedata.cpp filedata.h \
-	zipreader.cpp zipreader.h
+	zipreader.cpp zipreader.h \
+	sandbox.cpp sandbox.h
 
 all: all-am
 
@@ -256,6 +257,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filedata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filereader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sandbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zipreader.Po@am__quote@
 
 .cpp.o:

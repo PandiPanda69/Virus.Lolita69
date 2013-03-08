@@ -1,6 +1,7 @@
 *.pyc
 .*
 *.sw*
+antivirus/config.status
 antivirus/autom4te.cache
 antivirus/bin
 antivirus/*.log

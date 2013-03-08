@@ -11,7 +11,7 @@ def a(c):
 
 DECRYPT = """
 loc = locals()
-w,t,p,h ="", range(10,260,20),0,["p-=1","p+=1","t[p]+=1","t[p]-=1","w+='%c'%t[p]"]
+w,t,p,h ="", range(10,260,20),0,["p-=1","p+=1","t[p]+=1","t[p]-=1","w=''.join([w,'%c'%t[p]])"]
 k=[compile(x,'a','exec') for x in h]
 def b(d):
 	loc["c"] = d

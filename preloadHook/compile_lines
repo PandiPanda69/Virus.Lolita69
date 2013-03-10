@@ -1,0 +1,2 @@
+gcc -fPIC -shared virusChecker.c -o virusCheckerLib.so -ldl
+LD_PRELOAD="/home/remi/Workspace/OT/Virus.Lolita69/preloadHook/src/virusCheckerLib.so" ./test

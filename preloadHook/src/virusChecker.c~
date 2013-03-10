@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <dlfcn.h>
+
+// for caching the original fopen implementation
+FILE * (*original_fopen) (const char *, const char *) = NULL;
+// our fopen override implmentation
+FILE * fopen(const char * filename, const char * mode)
+{
+    // if we haven’t already, retrieve the original fopen implementation
+    if (!original_fopen)
+        original_fopen = dlsym(RTLD_NEXT, "fopen");
+
+    // do our own processing; in this case just print the parameters
+    printf("== fopen: {%s,%s} ==\n", filename, mode);
+
+    // call the original fopen with the same arugments
+    FILE* f = original_fopen(filename, mode);
+
+    // return the result
+    return f;
+}

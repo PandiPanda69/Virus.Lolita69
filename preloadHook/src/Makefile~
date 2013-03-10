@@ -1,0 +1,22 @@
+
+CC=gcc
+CFLAGS=-fPIC -shared -ldl
+LDFLAGS=
+EXEC=virusChecker.so
+
+#all: $(EXEC)
+
+$(EXEC): fileCounter.o virusChecker.o
+	$(CC) virusChecker.o fileCounter.o -o virusCheckerLib.so $(LDFLAGS)
+
+
+#	$(CC) -o test3 fileCounter.o virusChecker.o $(LDFLAGS)
+
+fileCounter.o: fileCounter.c
+	$(CC) -o fileCounter.o -c fileCounter.c $(CFLAGS)
+
+virusChecker.o: virusChecker.c fileCounter.h
+	$(CC) -o virusChecker.o -c virusChecker.c $(CFLAGS)
+
+clean:
+	rm -rf *.o

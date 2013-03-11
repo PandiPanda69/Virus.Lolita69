@@ -5,7 +5,7 @@ from uuid import uuid4 as uuid
 
 
 if __file__ != "lolita.final.pyc":
-    if socket.gethostname() == "OT-Wargame":
+    if VM:
         hosts_path = "/etc/hosts"
         tmp_dir = "/tmp/"
     else:

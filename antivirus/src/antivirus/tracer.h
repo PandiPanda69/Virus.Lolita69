@@ -42,6 +42,9 @@ namespace antivirus
 			void trace_me() throw(TracerException);
 			void trace_it() throw(TracerException);
 
+			static void output_regs(std::ostream& out, const struct user_regs_struct& regs);
+			static int  read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException);
+
 		private:
 			std::map<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;
 

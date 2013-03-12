@@ -168,4 +168,92 @@ namespace antivirus
 
 		return syscall_number;
 	}
+
+	/**
+	* Prints formatted register values out (in debug mode only)
+	* @param out Stream to print in
+	* @param regs Values to be printed out
+	*/
+	void Tracer::output_regs(std::ostream& out, const struct user_regs_struct& regs)
+	{
+	#ifdef __DEBUG
+		out << "Registers values:" << std::endl << "-------------------------------" << std::endl;
+
+		#define OUTPUT_REG(__name, __var)	out << __name << " : 0x" << std::hex << regs.__var << std::endl;
+
+		#ifdef __i386__
+			OUTPUT_REG("ORIG_EAX", orig_eax)
+			OUTPUT_REG("EAX", eax)
+			OUTPUT_REG("EBX", ebx)
+			OUTPUT_REG("ECX", ecx)
+			OUTPUT_REG("EDX", edx)
+			OUTPUT_REG("ESI", esi)
+			OUTPUT_REG("EDI", edi)
+			OUTPUT_REG("EIP", eip)
+			OUTPUT_REG("EBP", ebp)
+			OUTPUT_REG("ESP", esp)
+		#else
+			OUTPUT_REG("ORIG_RAX", orig_rax)
+			OUTPUT_REG("RAX", rax)
+			OUTPUT_REG("RBX", rbx)
+			OUTPUT_REG("RCX", rcx)
+			OUTPUT_REG("RDX", rdx)
+			OUTPUT_REG("RSI", rsi)
+			OUTPUT_REG("RDI", rdi)
+			OUTPUT_REG("RIP", rip)
+			OUTPUT_REG("RBP", rbp)
+			OUTPUT_REG("RSP", rsp)
+			OUTPUT_REG("R8", r8)
+			OUTPUT_REG("R9", r9)
+			OUTPUT_REG("R10", r10)
+			OUTPUT_REG("R11", r11)
+			OUTPUT_REG("R12", r12)
+			OUTPUT_REG("R13", r13)
+			OUTPUT_REG("R14", r14)
+			OUTPUT_REG("R15", r15)
+		#endif
+
+		out << std::dec;
+	#endif
+	}
+
+	/**
+	* Reads a string at the address <em>addr</em> of the process having id <em>pid</em> into the specified <em>buffer</em>.
+	* @param addr Address of the string to read
+	* @param buffer Buffer to put read content in
+	* @param buf_len Max size of the buffer
+	* @param pid Process ID of the process to read in
+	* @return How many characters have been read
+	*/
+	int Tracer::read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException)
+	{
+		if( buffer == NULL )
+			throw TracerException("Buffer is NULL.");
+
+		register char c;
+		register int offset;
+
+		offset = 0;
+
+		// Until ptrace returns an error or a '\0' is fetched, get character by character.
+		do
+		{
+			c = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
+
+			// If no error, append character to the string
+			if( c >= 0 )
+			{
+				buffer[offset] = c;
+				offset++;
+
+				// Avoid buffer overflow (+1 to take in consideration the '\0')
+				if( offset+1 > buf_len )
+					break;
+			}
+		} while( c != 0 && c != -1 );
+
+		buffer[offset] = 0;
+
+		return offset;
+	}
 }

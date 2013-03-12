@@ -24,11 +24,24 @@ void fill_syscall();
 namespace antivirus
 {
 	/**
+	* Returns the only instance of the class
+	*/
+	Tracer* Tracer::get_instance()
+	{
+		static Tracer inst;
+
+		return &inst;
+	}
+
+	/**
 	* Constructor
 	*/
 	Tracer::Tracer()
 	{
 		fill_syscall();
+
+		// Default behaviour
+		add_handler("clone", _clone_handler);
 	}
 
 	/**
@@ -59,13 +72,7 @@ namespace antivirus
 		if( ret != 0 && errno != 0 )
 			throw TracerException("ptrace initialization failed.");
 
-		// Even children must be traced
-                /* ret = ptrace(PTRACE_SETOPTIONS, getpid(), NULL, PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK | PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXIT);
-		if( ret != 0 )
-		{
-			perror("ptrace option failed");
-			throw TracerException(strerror(errno));
-		} */
+		_traced_process.insert(getpid());
 	}
 
 	/**
@@ -84,24 +91,21 @@ namespace antivirus
 			// Waits until a child sends a signal
 			child = waitpid(-1, &status, __WALL);
 
-			// Check if the signal tells us child exited or whatever
-			if(WIFEXITED(status))
+			// Check if the signal tells us children exited or whatever
+			if(WIFEXITED(status) || WIFSIGNALED(status) || !WIFSTOPPED(status) )
 			{
-				TRACE("Child exited.");
-				break;
-				must_continue = false;
-                        }
-                        if(WIFSIGNALED(status))
-			{
-				TRACE("Child killed.");
-				break;
-				must_continue = false;
-                        }
-                        if(!WIFSTOPPED(status))
-			{
-				TRACE("Unknown state.");
-				break;
-                                must_continue = false;
+				// Remove current child from traced process and, if there are no left, exit.
+				_traced_process.erase(child);
+
+				if(_traced_process.size() == 0 )
+				{
+					TRACE("No children anymore.");
+					break;
+				}
+				else
+					TRACE("A child exited (" << _traced_process.size() << " left).");
+
+				continue;
                         }
 
 			// Check if a syscall is gonna be called
@@ -142,9 +146,6 @@ namespace antivirus
 			struct user_regs_struct regs;
 
 			ptrace((__ptrace_request) PTRACE_GETREGS, pid, NULL, &regs);
-
-			TRACE(syscall_number << " - " << regs.orig_rax);
-
 			return ((*it).second)(pid, regs);
 		}
 
@@ -170,13 +171,32 @@ namespace antivirus
 	}
 
 	/**
+	* Traces offsprings
+	* @param pid The process ID of the new process to trace
+	*/
+	void Tracer::_trace_subprocess(pid_t pid)
+	{
+		int ret = ptrace(PTRACE_ATTACH, pid, NULL, NULL);
+
+		if( ret != 0 )
+		{
+			TRACE("ERROR - Cannot attach to process #" << pid);
+		}
+		else
+		{
+			_traced_process.insert(pid);	
+			TRACE(_traced_process.size() << " process are currently traced.");
+		}
+	}
+
+	/**
 	* Prints formatted register values out (in debug mode only)
 	* @param out Stream to print in
 	* @param regs Values to be printed out
 	*/
 	void Tracer::output_regs(std::ostream& out, const struct user_regs_struct& regs)
 	{
-	#ifdef __DEBUG
+	#ifdef DEBUG
 		out << "Registers values:" << std::endl << "-------------------------------" << std::endl;
 
 		#define OUTPUT_REG(__name, __var)	out << __name << " : 0x" << std::hex << regs.__var << std::endl;
@@ -255,5 +275,28 @@ namespace antivirus
 		buffer[offset] = 0;
 
 		return offset;
+	}
+
+	/**
+	* Default handler when clone syscall is invoked
+	* @return True.
+	*/
+	bool Tracer::_clone_handler(pid_t pid, struct user_regs_struct& regs)
+	{
+		// Check wether syscall has been executed and return value set (return values are put in rax/eax).
+		pid_t new_pid = -1;
+
+		#ifdef __i386__
+			new_pid = regs.eax;
+		#else
+			new_pid = regs.rax;
+		#endif
+
+		if( new_pid <= 0 )
+			return true;
+		
+		Tracer::get_instance()->_trace_subprocess(new_pid);
+
+		return true;
 	}
 }

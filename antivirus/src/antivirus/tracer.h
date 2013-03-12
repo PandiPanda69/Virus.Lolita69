@@ -4,6 +4,7 @@
 #include <exception>
 #include <string>
 #include <map>
+#include <set>
 
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
 
@@ -34,7 +35,7 @@ namespace antivirus
 	class Tracer
 	{
 		public:
-			Tracer();
+			static Tracer* get_instance();
 			virtual ~Tracer();
 
 			void add_handler(std::string syscall, bool (*handler)(pid_t, struct user_regs_struct&));
@@ -47,11 +48,17 @@ namespace antivirus
 
 		private:
 			std::map<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;
+			std::set<pid_t> _traced_process;
+
+			Tracer();
 
 			bool _trace_syscall(pid_t pid);
+			void _trace_subprocess(pid_t pid);
 
 			long _retrieve_syscall_id(pid_t pid);
 
+
+			static bool _clone_handler(pid_t pid, struct user_regs_struct& regs);
 	};
 }
 

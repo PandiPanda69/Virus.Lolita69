@@ -7,6 +7,8 @@
 
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
 
+struct user_regs_struct;
+
 namespace antivirus
 {
 	/**

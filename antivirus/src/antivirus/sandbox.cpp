@@ -249,14 +249,14 @@ namespace antivirus
 		filesystem::path lib_path(src);
 
 		// Build dest
-		dest  = _path;
+		dest  = _path + "/" ;
 		dest += lib_path.branch_path().string(); // Example: /foo/bar gives /foo
 
 		// Create directories
 		filesystem::create_directories(dest.c_str());
 
 		// Finally copy file
-		dest = _path + src;
+		dest = _path + "/" + src;
 		TRACE("Copying " << dest);
 		filesystem::copy_file(src, dest);
 	}

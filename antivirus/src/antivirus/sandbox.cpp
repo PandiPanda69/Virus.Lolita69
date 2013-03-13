@@ -6,12 +6,15 @@
 #include <unistd.h>
 
 #include "sandbox.h"
+#include "tracer.h"
 #include "debug.h"
 
 using namespace boost;
 
 namespace antivirus
 {
+	SandBox* SandBox::_current_instance = NULL;
+
 	/**
 	* Constructor
 	* @param path Path of the sandboxed environnement
@@ -20,6 +23,8 @@ namespace antivirus
 	SandBox::SandBox(const std::string& path) throw(SandBoxException) : _path(path)
 	{
 		_initialize();
+
+		SandBox::_current_instance = this;
 	}
 
 	/**
@@ -44,6 +49,9 @@ namespace antivirus
 	*/
 	void SandBox::prepare(const std::string& target) throw(SandBoxException)
 	{
+		if(target.size() <= 0)
+			throw SandBoxException();
+
 		// Keep target
 		_target = target;
 
@@ -73,7 +81,10 @@ namespace antivirus
 		}
 
 		// Change current directory
-		chdir( _path.c_str() );
+		if( chdir( _path.c_str() ) != 0 )
+		{
+			TRACE("chdir failed.");
+		}
 	}
 
 	/**
@@ -98,6 +109,18 @@ namespace antivirus
 	}
 
 	/**
+	* Initialize tracer to cooperate with the sandbox
+	*/
+	void SandBox::initialize_tracer() throw(SandBoxException)
+	{
+		Tracer* the_tracer = Tracer::get_instance();
+
+		the_tracer->add_handler("execve", _execve_handler);
+		the_tracer->add_handler("access",  _access_and_open_handler);
+		the_tracer->add_handler("open",   _access_and_open_handler);
+	}
+
+	/**
 	* Initialize SandBox duty
 	*/
 	void SandBox::_initialize() throw(SandBoxException)
@@ -106,7 +129,7 @@ namespace antivirus
 		if( filesystem::exists(_path) )
 		{
 			TRACE("Path already exists.");
-			throw SandBoxException();
+			throw SandBoxException("Path already exists.");
 		}
 
 		// Then create directory
@@ -144,7 +167,7 @@ namespace antivirus
 		if( ret != 0 )
 		{
 			TRACE("System err.");
-			throw SandBoxException();
+			throw SandBoxException("System returned an error");
 		}
 
 		// Read file content
@@ -159,8 +182,9 @@ namespace antivirus
 		long length = is.tellg();
 		is.seekg(0, std::ios::beg);
 
-		char* buffer = new char[length];
+		char* buffer = new char[length+1];
 		is.read(buffer, length);
+		buffer[length] = 0;
 
 		is.close();
 
@@ -257,7 +281,229 @@ namespace antivirus
 
 		// Finally copy file
 		dest = _path + "/" + src;
-		TRACE("Copying " << dest);
-		filesystem::copy_file(src, dest);
+		if(filesystem::exists(dest) == false)
+		{
+			TRACE("Copying " << dest);
+			filesystem::copy_file(src, dest);
+		}
+	}
+
+	/**
+	* Determines the full path of the passed command <em>cmd</em>.
+	* @param cmd Command to look for
+	* @return Full path
+	* @throw SandBoxException If the command cannot be stated.
+	*/
+	std::string SandBox::_get_command_location(const std::string& cmd) throw(SandBoxException)
+	{
+		// Test the string is valid
+		if(cmd.size() <= 0)
+			throw SandBoxException("Empty command.");
+
+		// Begin to check the current path
+		if( filesystem::exists(cmd) )
+			return cmd;
+
+		if( filesystem::exists("./" + cmd) )
+			return std::string("./" + cmd);
+
+		// Then get the PATH variable and split it
+		std::vector<std::string> path_to_check;
+		std::string path_env = getenv("PATH");
+
+		if( path_env.size() >= 0 )
+		{
+			std::string buf;
+			int current_pos = 0;
+			int last_pos = 0;
+			bool must_continue = true;		
+
+			do
+			{
+				current_pos = path_env.find(":", last_pos);
+				if(current_pos == std::string::npos)
+				{
+					// The path starts from last_pos until the end
+					buf = path_env.substr(last_pos, path_env.size() - last_pos);
+					must_continue = false;
+				}
+				else
+				{
+					buf = path_env.substr(last_pos, current_pos - last_pos);
+
+					// Keep last_pos and add 1 to skip the ':'
+					last_pos = current_pos + 1;
+				}
+
+				path_to_check.push_back(buf + "/");
+
+			} while(must_continue);
+		}
+
+		// Begin to check!
+		std::vector<std::string>::iterator it;
+
+		for( it = path_to_check.begin(); it != path_to_check.end(); it++)
+		{
+			if(filesystem::exists((*it) + cmd))
+				return (*it + cmd);
+		}
+
+		// File not found !
+		throw SandBoxException("File cannot be found.");
+	}
+
+	/**
+	* Handler of the system call execve that allows to sandbox subprocess too.
+	*/
+	bool SandBox::_execve_handler(pid_t pid, struct user_regs_struct& regs)
+	{
+		long cmd_addr;
+		long params_addr;
+
+		// Get values depending on arch.
+		#ifdef __i386__
+			cmd_addr = regs.edx;
+			params_addr = regs.ecx;
+		#else
+			cmd_addr = regs.rdi;
+			params_addr = regs.rsi;
+		#endif
+
+		/* 
+		 * Algorithm is simple:
+		 * 1.	Get command and check wether it's a command by looking at the PATH specified directories.
+		 * 2.	Check wether the command isn't already sandboxed, if not do it.
+		 * 3.	Get parameters list and split them if they contain spaces.
+		 * 4.	Check wehther they are files or not
+		 * 5.   Same as 2.
+		 */
+
+		// Step 1.
+		char buffer[MAX_BUFFER_SIZE];
+		Tracer::read_string_at(cmd_addr, buffer, MAX_BUFFER_SIZE, pid);
+
+		try
+		{
+			std::string full_path = _get_command_location(buffer);	
+			TRACE(full_path);
+			_current_instance->prepare(full_path);
+
+			// Step 2.
+			_current_instance->_copy_file_and_create_subdirs(full_path);
+		}
+		catch(SandBoxException ex)
+		{
+			TRACE("Command cannot be sandboxed... " << ex.what());
+		}
+
+		// Step 3.
+		std::vector<std::string> params = Tracer::read_string_array_at(params_addr, pid);
+
+		if( params.size() > 0 )
+		{
+			std::vector<std::string>::iterator it;
+
+			std::vector<std::string> strings_to_check;
+			int next_pos = 0;
+			int last_pos = 0;
+			for(it = params.begin(); it != params.end(); it++)
+			{
+				// Check if there are any space in the current string
+				next_pos = (*it).find( " ", last_pos );
+				if( next_pos == std::string::npos )
+				{
+					strings_to_check.push_back(*it);
+					continue;	
+				}
+				else
+				{
+					// Splitting
+					bool must_continue = true;
+					while( must_continue )
+					{
+						strings_to_check.push_back((*it).substr( last_pos, next_pos - last_pos ));
+
+						last_pos = next_pos + 1;
+
+						next_pos = (*it).find( " ", last_pos );
+						if( next_pos == std::string::npos )
+							must_continue = false;
+					}
+				}
+			}
+
+			// Step 4.
+			std::string full_path;
+			for(it = strings_to_check.begin(); it != strings_to_check.end(); it++)
+			{
+				if(filesystem::exists(*it))
+					full_path = (*it);
+				else
+				{
+					try
+					{
+						full_path = _get_command_location(*it);
+					}
+					catch( SandBoxException ex )
+					{
+						// It's not a file, check the next string
+						continue;
+					}
+				}
+
+				TRACE(full_path);
+
+				// Step 5.
+				// A little check that is crucial ! Is it a directory?
+				// If yes, just create the directory, else, this is the easy way
+				if( filesystem::is_directory(full_path) == true )
+				{
+					filesystem::create_directories(_current_instance->_path + "/" + full_path);
+				}
+				else
+				{
+					try
+					{
+						_current_instance->prepare(full_path);
+						_current_instance->_copy_file_and_create_subdirs(full_path);
+					}
+					catch( SandBoxException ex )
+					{
+						TRACE( ex.what() );
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	* Handler of the system calls access & open that allows to place unknown files into the sandbox.
+	* Both access & open calls have the string containing filename in 1st position.
+	*/
+	bool SandBox::_access_and_open_handler(pid_t pid, struct user_regs_struct& regs)
+	{
+                long file_addr;
+
+                // Get values depending on arch.
+                #ifdef __i386__
+                        file_addr = regs.edx;
+                #else
+                        file_addr = regs.rdi;
+                #endif
+
+		char filename[MAX_BUFFER_SIZE];
+		Tracer::read_string_at(file_addr, filename, MAX_BUFFER_SIZE, pid);
+
+		// Check wether this file exists
+		if(filesystem::exists(filename) == true)
+		{
+			// And copy it into the filesystem
+			_current_instance->_copy_file_and_create_subdirs(filename);
+		}
+
+		return true;
 	}
 }

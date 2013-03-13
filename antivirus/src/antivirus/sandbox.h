@@ -5,6 +5,8 @@
 #include <exception>
 #include <vector>
 
+#include <sys/user.h>
+
 #define __ANTIVIR_LDD_RES_TMP_FILE	"._ldd_res"
 
 namespace antivirus
@@ -14,6 +16,13 @@ namespace antivirus
 		public:
 			SandBoxException() throw()  { }
 			~SandBoxException() throw() { }
+
+			SandBoxException(const std::string& msg) throw() : _msg(msg) { }
+
+			std::string& what() throw() { return _msg; }
+
+		private:
+			std::string _msg;
 	};
 
 	/**
@@ -34,7 +43,11 @@ namespace antivirus
 			void set_additionnal_dependencies(std::vector<std::string> deps) throw(SandBoxException);
 			void set_additionnal_files(std::vector<std::string> files) throw(SandBoxException);
 
+			void initialize_tracer() throw(SandBoxException);
+
 		private:
+			static SandBox* _current_instance;
+
 			std::string _path;
 			std::string _target;
 
@@ -47,6 +60,12 @@ namespace antivirus
 			void _parse_ldd_result(const std::string& raw_file, std::vector<std::string>* ptr_deps) const;
 
 			void _copy_file_and_create_subdirs(const std::string& src) const;
+
+			static std::string _get_command_location(const std::string& cmd) throw(SandBoxException);
+
+			static bool _execve_handler(pid_t pid, struct user_regs_struct& regs);
+			static bool _access_and_open_handler(pid_t pid, struct user_regs_struct& regs);
+
 	};
 }
 

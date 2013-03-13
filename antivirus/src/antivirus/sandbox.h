@@ -64,7 +64,7 @@ namespace antivirus
 			static std::string _get_command_location(const std::string& cmd) throw(SandBoxException);
 
 			static bool _execve_handler(pid_t pid, struct user_regs_struct& regs);
-			static bool _access_and_open_handler(pid_t pid, struct user_regs_struct& regs);
+			static bool _stat_access_and_open_handler(pid_t pid, struct user_regs_struct& regs);
 
 	};
 }

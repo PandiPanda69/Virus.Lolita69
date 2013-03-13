@@ -116,8 +116,9 @@ namespace antivirus
 		Tracer* the_tracer = Tracer::get_instance();
 
 		the_tracer->add_handler("execve", _execve_handler);
-		the_tracer->add_handler("access",  _access_and_open_handler);
-		the_tracer->add_handler("open",   _access_and_open_handler);
+		the_tracer->add_handler("access",  _stat_access_and_open_handler);
+		the_tracer->add_handler("open",    _stat_access_and_open_handler);
+		the_tracer->add_handler("stat",    _stat_access_and_open_handler);
 	}
 
 	/**
@@ -164,7 +165,7 @@ namespace antivirus
 
 		// Execute command
 		int ret = ::system(command.c_str());
-		if( ret != 0 )
+		if( ret < 0 )
 		{
 			TRACE("System err.");
 			throw SandBoxException("System returned an error");
@@ -279,12 +280,25 @@ namespace antivirus
 		// Create directories
 		filesystem::create_directories(dest.c_str());
 
-		// Finally copy file
 		dest = _path + "/" + src;
-		if(filesystem::exists(dest) == false)
+
+		// Check the file isn't in /dev, it's still annoying to copy a device such hard drive...
+		if(src.find("/dev") == 0)
 		{
-			TRACE("Copying " << dest);
-			filesystem::copy_file(src, dest);
+			// If it's the case, then just put an empty file
+			std::ofstream os(dest.c_str());
+			os.close();
+
+			TRACE("Touched " << dest);
+		}
+		else
+		{
+			// Finally copy file
+			if(filesystem::exists(dest) == false)
+			{
+				TRACE("Copying " << dest);
+				filesystem::copy_file(src, dest);
+			}
 		}
 	}
 
@@ -480,10 +494,10 @@ namespace antivirus
 	}
 
 	/**
-	* Handler of the system calls access & open that allows to place unknown files into the sandbox.
-	* Both access & open calls have the string containing filename in 1st position.
+	* Handler of the system calls stat, access & open that allows to place unknown files into the sandbox.
+	* stat, access & open calls have the string containing filename in 1st position.
 	*/
-	bool SandBox::_access_and_open_handler(pid_t pid, struct user_regs_struct& regs)
+	bool SandBox::_stat_access_and_open_handler(pid_t pid, struct user_regs_struct& regs)
 	{
                 long file_addr;
 

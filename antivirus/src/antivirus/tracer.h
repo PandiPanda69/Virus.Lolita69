@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
 
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
 
@@ -44,7 +45,8 @@ namespace antivirus
 			void trace_it() throw(TracerException);
 
 			static void output_regs(std::ostream& out, const struct user_regs_struct& regs);
-			static int  read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException);
+			static size_t read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException);
+			static std::vector<std::string> read_string_array_at(long addr, pid_t pid) throw(TracerException);
 
 		private:
 			std::map<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;

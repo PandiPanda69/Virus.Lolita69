@@ -16,6 +16,10 @@
 
 #include "debug.h"
 
+
+#define MAX_BUFFER_SIZE	4096
+
+
 // Defined in syscall.cpp
 extern std::vector<std::string> syscall_names;
 void fill_syscall();
@@ -245,7 +249,7 @@ namespace antivirus
 	* @param pid Process ID of the process to read in
 	* @return How many characters have been read
 	*/
-	int Tracer::read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException)
+	size_t Tracer::read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException)
 	{
 		if( buffer == NULL )
 			throw TracerException("Buffer is NULL.");
@@ -275,6 +279,41 @@ namespace antivirus
 		buffer[offset] = 0;
 
 		return offset;
+	}
+
+	/**
+	* Reads an array of string at the address <em>addr</em> of the process having id <em>pid</em>.
+	* @param addr Address to read
+	* @param pid Process id of the process to read in
+	* @return Vector of strings
+	*/
+	std::vector<std::string> Tracer::read_string_array_at(long addr, pid_t pid) throw(TracerException)
+	{
+		std::vector<std::string> result;
+
+		char buffer[MAX_BUFFER_SIZE];
+		register long next_addr;
+		register long offset;
+
+		offset = 0;
+
+		do
+		{
+			next_addr = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
+
+			if(next_addr > 0)
+			{
+				Tracer::read_string_at(next_addr, buffer, MAX_BUFFER_SIZE, pid);
+
+				result.push_back(buffer);
+
+				// Offset calculation is quite easy : add address size (arch makes it different)
+				offset += sizeof(long);
+			}
+		}
+		while( next_addr != 0 && next_addr != -1 );
+
+		return result;
 	}
 
 	/**

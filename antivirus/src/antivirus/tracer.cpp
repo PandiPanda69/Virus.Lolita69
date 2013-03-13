@@ -17,9 +17,6 @@
 #include "debug.h"
 
 
-#define MAX_BUFFER_SIZE	4096
-
-
 // Defined in syscall.cpp
 extern std::vector<std::string> syscall_names;
 void fill_syscall();
@@ -75,19 +72,21 @@ namespace antivirus
 		ret = ptrace(PTRACE_TRACEME, 0, NULL, NULL);
 		if( ret != 0 && errno != 0 )
 			throw TracerException("ptrace initialization failed.");
-
-		_traced_process.insert(getpid());
 	}
 
 	/**
 	* Run the step-by-step analysis.
 	* This method isn't asynchronous, it returns when observed process ends.
+	* @param pid Process ID of the process to trace
 	*/
-	void Tracer::trace_it() throw(TracerException)
+	void Tracer::trace_it(pid_t pid) throw(TracerException)
 	{
 		pid_t child;
 		bool must_continue;
 		int status;
+
+		// Keep in mind which process we trace
+		_traced_process.insert(pid);
 
 		must_continue = true;
 		while(must_continue)
@@ -143,6 +142,8 @@ namespace antivirus
 			return true;
 		}
 
+		TRACE(syscall_names[syscall_number]);
+
 		// Get associated handler
 		std::map<std::string, ANTIVIR_TRACER_HANDLER>::iterator it = _handler_mapping.find( syscall_names[syscall_number] );
 		if(it != _handler_mapping.end())
@@ -189,7 +190,7 @@ namespace antivirus
 		else
 		{
 			_traced_process.insert(pid);	
-			TRACE(_traced_process.size() << " process are currently traced.");
+			TRACE(_traced_process.size() << " process are currently traced. (" << pid << ")");
 		}
 	}
 

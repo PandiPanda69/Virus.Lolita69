@@ -7,6 +7,8 @@
 #include <set>
 #include <vector>
 
+#define MAX_BUFFER_SIZE	4096
+
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
 
 struct user_regs_struct;
@@ -42,7 +44,7 @@ namespace antivirus
 			void add_handler(std::string syscall, bool (*handler)(pid_t, struct user_regs_struct&));
 
 			void trace_me() throw(TracerException);
-			void trace_it() throw(TracerException);
+			void trace_it(pid_t pid) throw(TracerException);
 
 			static void output_regs(std::ostream& out, const struct user_regs_struct& regs);
 			static size_t read_string_at(long addr, char* buffer, size_t buf_len, pid_t pid) throw(TracerException);

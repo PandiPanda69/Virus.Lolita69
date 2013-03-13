@@ -142,8 +142,6 @@ namespace antivirus
 			return true;
 		}
 
-		TRACE(syscall_names[syscall_number]);
-
 		// Get associated handler
 		std::map<std::string, ANTIVIR_TRACER_HANDLER>::iterator it = _handler_mapping.find( syscall_names[syscall_number] );
 		if(it != _handler_mapping.end())

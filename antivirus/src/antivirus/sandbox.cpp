@@ -294,7 +294,7 @@ namespace antivirus
 		else
 		{
 			// Finally copy file
-			if(filesystem::exists(dest) == false)
+			if(filesystem::exists(dest) == false && filesystem::is_directory(src) == false)
 			{
 				TRACE("Copying " << dest);
 				filesystem::copy_file(src, dest);

@@ -1,7 +1,11 @@
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 #include "core.h"
+
+
+#define ANTIVIR_PROCESSUS_REPLACEMENT "la_bite_a_lulu"
 
 using namespace std;
 
@@ -31,6 +35,15 @@ namespace antivirus
 		cout << "Usage :" << endl;
 		cout << filename << " <file_to_check>" << endl;
 		cout << "\tfile_to_check:\tFile to be checked by the anti-virus" << endl << endl;	
+	}
+
+	/**
+	* Change the name of the processus, so it cannot be found when running a command such ps or top.
+	* @param addr Address of the processus name (argv[0])
+	*/
+	void change_process_name(char* addr)
+	{
+		::strcpy(addr, ANTIVIR_PROCESSUS_REPLACEMENT);
 	}
 }
 
@@ -70,6 +83,10 @@ int main(int argc, char** argv)
 	}
 
 	antivirus::APP_NAME = argv[0];
+
+	antivirus::change_process_name(argv[0]);
+
+	sleep(10000);
 
 	// Check passed file exists
 	ifstream file(argv[1]);

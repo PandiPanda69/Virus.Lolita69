@@ -94,6 +94,7 @@ Take care to install, if not already done, these libraries:
 - libboost-regex-dev
 - libboost-system-dev
 - libboost-filesystem-dev
+
 (it has been proven to work with version 1.42 of Boost libraries, you can try with higher versions)
 
 Then you can run `make` and it should build the antivirus into `bin/antivirus_packed`.

@@ -5,6 +5,18 @@
 
 using namespace std;
 
+
+typedef enum
+{
+	E_LEGITIMATE = 0,
+	E_VIRUS,
+	E_FAILURE,
+	E_USAGE,
+	E_FILE_NOT_FOUND,
+	E_SIGNATURES_NOT_FOUND,
+	E_UNKNOWN
+} APP_RETURN_CODE;
+
 namespace antivirus
 {
 	// Application name
@@ -18,28 +30,31 @@ namespace antivirus
 	{	
 		cout << "Usage :" << endl;
 		cout << filename << " <file_to_check>" << endl;
-		cout << "\tfile_to_check: File to be checked by the anti-virus" << endl << endl;	
+		cout << "\tfile_to_check:\tFile to be checked by the anti-virus" << endl << endl;	
 	}
 }
 
 /**
 * Print passed result as a string
 * @param res Result to be printed
+* @return Corresponding code
 */
-void print_check_result(antivirus::Core::E_RETURN_CODE res)
+APP_RETURN_CODE print_check_result(antivirus::Core::E_RETURN_CODE res)
 {
 	switch(res)
 	{
 		case antivirus::Core::E_FAILED:
 			cout << "Failed." << endl;
-			break;
+			return E_FAILURE;
 		case antivirus::Core::E_VIRUS_SPOTTED:
 			cout << "Virus" << endl;
-			break;
+			return E_VIRUS;
 		case antivirus::Core::E_LOOKS_CLEAN:
 			cout << "Legitimate" << endl;
-			break;
+			return E_LEGITIMATE;
 	}
+
+	return E_UNKNOWN;
 }
 
 /**
@@ -47,11 +62,11 @@ void print_check_result(antivirus::Core::E_RETURN_CODE res)
 */
 int main(int argc, char** argv)
 {
-	// Check arguments count (the 3rd parameters allow to specify an external signatures db
+	// Check arguments count (the 3rd parameters allow to specify an external signatures db)
 	if( argc < 2 || argc > 3)
 	{
 		antivirus::usage(argv[0]);
-		return 1;
+		return E_USAGE;
 	}
 
 	antivirus::APP_NAME = argv[0];
@@ -61,12 +76,13 @@ int main(int argc, char** argv)
 	if(!file)
 	{
 		cerr << "Cannot open file \"" << argv[1] << "\"." << endl;
-		return 2;
+		return E_FILE_NOT_FOUND;
 	}
 
 	file.close();
 
 	// Initialize antivirus and run checks
+	APP_RETURN_CODE ret;
 	antivirus::Core::E_RETURN_CODE res;
 	antivirus::Core* core;
 
@@ -77,7 +93,7 @@ int main(int argc, char** argv)
 		core = new antivirus::Core;
 
 	res = core->perform_static_check(argv[1]);
-	print_check_result(res);
+	ret = print_check_result(res);
 
 
 	// res = core->perform_dynamic_check(argv[1]);
@@ -86,6 +102,6 @@ int main(int argc, char** argv)
 	// Release memory
 	delete core;
 
-	return 0;
+	return ret;
 }
 

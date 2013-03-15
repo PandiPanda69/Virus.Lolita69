@@ -95,9 +95,12 @@ int main(int argc, char** argv)
 	res = core->perform_static_check(argv[1]);
 	ret = print_check_result(res);
 
-
-	// res = core->perform_dynamic_check(argv[1]);
-	// print_check_result(res);
+	// If the file has not been statically detected as suspicious, performs a dynamic check.
+	if( ret != E_VIRUS )
+	{
+		res = core->perform_dynamic_check(argv[1]);
+		ret = print_check_result(res);
+	}
 
 	// Release memory
 	delete core;

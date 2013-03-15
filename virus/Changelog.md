@@ -8,7 +8,7 @@ Version 3
 * Changement du nom et de la valeur de la constante qui sert à délimiter le code à copier pour l'infection.
 * Ajout de NOP aléatoires dans lolita.final.pyc entre chaque opcode au build.
 * La sortie d'erreur est redirigée vers /dev/null pour éviter de leaker des informations si le virus rencontre une erreur non gérée.
-* Ajout d'une couche (xor_light) d'obfuscation sans aucune dépendance (à part getattr, __import__ et marshal) pour plus de discrétion. Cette couche est la première visible dans lolita.final.pyc. C'est un XOR avec clé aléatoire stockée après le chiffré (contrairement à la couche xor). C'est aussi la couche qui est rajoutée lors de l'infection pour créer le polymorphisme. Cette couche est obfusquée à la main (pour qu'on ne voit pas qu'on utilise marshal.loads)
+* Ajout d'une couche (xor_light) d'obfuscation sans aucune dépendance (à part getattr, \__import\__ et marshal) pour plus de discrétion. Cette couche est la première visible dans lolita.final.pyc. C'est un XOR avec clé aléatoire stockée après le chiffré (contrairement à la couche xor). C'est aussi la couche qui est rajoutée lors de l'infection pour créer le polymorphisme. Cette couche est obfusquée à la main (pour qu'on ne voit pas qu'on utilise marshal.loads)
 * Plus aucune dépendance à base64 (les binaires sont écrits avec des \x[hexa] dans les .py avant compilation, le résultat est le même (stocker du binaire dans un fichier source) mais ça fait une lib de moins).
 * Passage au niveau 9 (max) de compression zlib.
 * Utilisation d'un minifier lors du build pour réduire un peu la taille du code et supprimer les commentaires.

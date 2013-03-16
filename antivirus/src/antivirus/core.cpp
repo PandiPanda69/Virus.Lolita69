@@ -6,6 +6,7 @@
 #include "tracer.h"
 #include "sandbox.h"
 #include "commandrunner.h"
+#include "descriptortracer.h"
 
 #include "debug.h"
 
@@ -169,6 +170,10 @@ namespace antivirus
 		SandBox sandbox(ANTIVIR_SANDBOX_DIR);
 	
 		sandbox.prepare(filename);
+		sandbox.initialize_tracer();
+
+		// Initialize handler to trace descriptors
+		DescriptorTracer::initialize_descriptor_tracer();
 
 		// Fork processes, one that runs the sandboxed process, other that traces execution
 		pid_t pid = fork();

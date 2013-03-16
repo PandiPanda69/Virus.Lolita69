@@ -270,7 +270,7 @@ namespace antivirus
 			c = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
 
 			// If no error, append character to the string
-			if( c >= 0 )
+			if( c != 0 && c != -1 )
 			{
 				buffer[offset] = c;
 				offset++;

@@ -119,6 +119,7 @@ namespace antivirus
 		the_tracer->add_handler("access",  _stat_access_and_open_handler);
 		the_tracer->add_handler("open",    _stat_access_and_open_handler);
 		the_tracer->add_handler("stat",    _stat_access_and_open_handler);
+		the_tracer->add_handler("stat64",  _stat_access_and_open_handler);
 	}
 
 	/**
@@ -377,7 +378,7 @@ namespace antivirus
 
 		// Get values depending on arch.
 		#ifdef __i386__
-			cmd_addr = regs.edx;
+			cmd_addr = regs.ebx;
 			params_addr = regs.ecx;
 		#else
 			cmd_addr = regs.rdi;
@@ -503,7 +504,7 @@ namespace antivirus
 
                 // Get values depending on arch.
                 #ifdef __i386__
-                        file_addr = regs.edx;
+                        file_addr = regs.ebx;
                 #else
                         file_addr = regs.rdi;
                 #endif

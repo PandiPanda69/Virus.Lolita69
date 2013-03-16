@@ -1,8 +1,11 @@
-#include <iostream>
+#include <signal.h>
 
 #include "core.h"
 #include "filereader.h"
 #include "zipreader.h"
+#include "tracer.h"
+#include "sandbox.h"
+#include "commandrunner.h"
 
 #include "debug.h"
 
@@ -114,6 +117,8 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::perform_dynamic_check(const std::string& filename)
 	{
+		_dynamic_check_by_tracing(filename);
+
 		return E_FAILED;
 	}
 
@@ -139,5 +144,64 @@ namespace antivirus
 		}
 	
 		return matched;
+	}
+
+	/**
+	* Performs a dynamic check using hijacking method.
+	* @param filename File to be checked
+	* @return E_FAILED if something went wrong, E_VIRUS_SPOTTED if this is a virus, or E_LOOKS_CLEAN if it's a regular file
+	*/
+	Core::E_RETURN_CODE Core::_dynamic_check_by_hijacking(const std::string& filename)
+	{
+		
+
+		return E_FAILED;
+	}
+
+	/**
+	* Performs a dynamic check using system calls tracing method.
+	* @param filename File to be checked
+	* @return E_FAILED if something went wrong, E_VIRUS_SPOTTED if this is a virus, or E_LOOKS_CLEAN if it's a regular file
+	*/
+	Core::E_RETURN_CODE Core::_dynamic_check_by_tracing(const std::string& filename)
+	{
+		// Sandbox the process
+		SandBox sandbox(ANTIVIR_SANDBOX_DIR);
+	
+		sandbox.prepare(filename);
+
+		// Fork processes, one that runs the sandboxed process, other that traces execution
+		pid_t pid = fork();
+		if( pid == 0 )
+		{
+			// Determine file type, and interpreter if needed
+			CommandRunner runner(filename);
+			CommandRunner::COMMAND_INFO_STRUCT command = runner.resolve();
+
+			// Prepare sandbox & tracer
+			sandbox.run();
+			Tracer::get_instance()->trace_me();
+
+			// Synchronize with parent :-)
+			kill(getpid(), SIGSTOP);
+
+			// Run the process
+			if( command.type == CommandRunner::TYPE_ELF )
+			{
+				char* const param[] = { (char*) command.absolute_filename.c_str(), NULL };
+				execve(param[0], param, environ);
+			}
+			else
+			{
+				char* const param[] = { (char*) command.absolute_interpreter.c_str(), (char*) command.absolute_filename.c_str(), NULL };
+				execve(param[0], param, environ);
+			}
+
+			throw exception();
+		}
+
+		Tracer::get_instance()->trace_it(pid);
+
+		return E_FAILED;
 	}
 }

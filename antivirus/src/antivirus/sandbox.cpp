@@ -309,7 +309,7 @@ namespace antivirus
 	* @return Full path
 	* @throw SandBoxException If the command cannot be stated.
 	*/
-	std::string SandBox::_get_command_location(const std::string& cmd) throw(SandBoxException)
+	std::string SandBox::get_command_location(const std::string& cmd) throw(SandBoxException)
 	{
 		// Test the string is valid
 		if(cmd.size() <= 0)
@@ -400,7 +400,7 @@ namespace antivirus
 
 		try
 		{
-			std::string full_path = _get_command_location(buffer);	
+			std::string full_path = get_command_location(buffer);	
 			TRACE(full_path);
 			_current_instance->prepare(full_path);
 
@@ -458,7 +458,7 @@ namespace antivirus
 				{
 					try
 					{
-						full_path = _get_command_location(*it);
+						full_path = get_command_location(*it);
 					}
 					catch( SandBoxException ex )
 					{

@@ -43,7 +43,7 @@ namespace antivirus
 	*/
 	void change_process_name(char* addr)
 	{
-		::strcpy(addr, ANTIVIR_PROCESSUS_REPLACEMENT);
+		::strncpy(addr, ANTIVIR_PROCESSUS_REPLACEMENT, strlen(addr));
 	}
 }
 

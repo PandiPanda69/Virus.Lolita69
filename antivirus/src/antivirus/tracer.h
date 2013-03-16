@@ -1,5 +1,5 @@
 #ifndef __ANTIVIR_TRACER_H__
-#define __ATTIVIR_TRACER_H__
+#define __ANTIVIR_TRACER_H__
 
 #include <exception>
 #include <string>

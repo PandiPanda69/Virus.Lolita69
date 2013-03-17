@@ -38,10 +38,12 @@ namespace antivirus
 	class Tracer
 	{
 		public:
+			typedef std::string syscall_name;
+
 			static Tracer* get_instance();
 			virtual ~Tracer();
 
-			void add_handler(std::string syscall, bool (*handler)(pid_t, struct user_regs_struct&));
+			void add_handler(syscall_name syscall, bool (*handler)(pid_t, struct user_regs_struct&));
 
 			void trace_me() throw(TracerException);
 			void trace_it(pid_t pid) throw(TracerException);
@@ -51,7 +53,7 @@ namespace antivirus
 			static std::vector<std::string> read_string_array_at(long addr, pid_t pid) throw(TracerException);
 
 		private:
-			std::multimap<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;
+			std::multimap<syscall_name, ANTIVIR_TRACER_HANDLER> _handler_mapping;
 			std::set<pid_t> _traced_process;
 
 			Tracer();

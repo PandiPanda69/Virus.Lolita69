@@ -57,9 +57,9 @@ namespace antivirus
 	* @param syscall System call name
 	* @handler Handler to associate
 	*/
-	void Tracer::add_handler(std::string syscall, bool (*handler)(pid_t, struct user_regs_struct&))
+	void Tracer::add_handler(syscall_name syscall, bool (*handler)(pid_t, struct user_regs_struct&))
 	{
-		_handler_mapping.insert(std::pair<std::string, ANTIVIR_TRACER_HANDLER>( syscall, handler ));
+		_handler_mapping.insert(std::pair<syscall_name, ANTIVIR_TRACER_HANDLER>( syscall, handler ));
 	}
 
 	/**
@@ -143,13 +143,13 @@ namespace antivirus
 		}
 
 		// Get associated handlers
-		std::pair<std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator, std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator> handlers_it;
+		std::pair<std::multimap<syscall_name, ANTIVIR_TRACER_HANDLER>::iterator, std::multimap<syscall_name, ANTIVIR_TRACER_HANDLER>::iterator> handlers_it;
 
 		handlers_it = _handler_mapping.equal_range( syscall_names[syscall_number] );
 
 		// Then, execute them all
 		bool result = true;
-		std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator it;
+		std::multimap<syscall_name, ANTIVIR_TRACER_HANDLER>::iterator it;
 		for(it = handlers_it.first; it != handlers_it.second && result == true; it++)
 		{
 			struct user_regs_struct regs;

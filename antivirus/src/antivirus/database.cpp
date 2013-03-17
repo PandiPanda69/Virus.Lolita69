@@ -11,13 +11,21 @@ namespace antivirus
 	Database::Database()
 	{
 		// Initializes key
-		_key_length = 3;
+		_key_length = 11;
 
 		_key = new unsigned char[_key_length];
 
-		_key[0] = 0xB;
-		_key[1] = 0xA;
-		_key[2] = 0xD;
+		_key[0]  = 0xB;
+		_key[1]  = 0xA;
+		_key[2]  = 0xD;
+		_key[3]  = 0xD;
+		_key[4]  = 0xE;
+		_key[5]  = 0xA;
+		_key[6]  = 0xD;;
+		_key[7]  = 0xB;;
+		_key[8]  = 0xA;;
+		_key[9]  = 0xB;;
+		_key[10] = 0xE;;
 	}
 
 	/**

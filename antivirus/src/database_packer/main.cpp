@@ -14,8 +14,8 @@ enum
 namespace antivirus
 {
 	// Key used to (de)crypt data
-	const unsigned char KEY[] = { 0xB, 0xA, 0xD };
-	const size_t KEY_LENGTH = 3;
+	const unsigned char KEY[] = { 0xB, 0xA, 0xD, 0xD, 0xE, 0xA, 0xD, 0xB, 0xA, 0xB, 0xE };
+	const size_t KEY_LENGTH = 11;
 
 	/**
 	* Display usage

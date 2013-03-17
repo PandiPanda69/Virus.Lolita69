@@ -9,20 +9,36 @@
 
 #include "unpacker.h"
 
-namespace antivirus {
-	Unpacker::Unpacker(std::string filename) :
-			_filename(filename) { }
+antivirus::Unpacker::Unpacker(std::string filename) :
+		_filename(filename) { }
 
-	Unpacker::~Unpacker() { }
+antivirus::Unpacker::~Unpacker() { }
 
-	void Unpacker::execute(std::string output) {
+void antivirus::Unpacker::execute(std::string output, bool unscramble) {
 
-		// generating default name if output is empty
-		if (output.empty())
-			output = _filename + UNPACKED_SUFFIX;
+	std::string tempFile = _filename;
 
-		// unpacking file
-		std::string command = "upx -d " + _filename + " -o " + output;
-		system(command.c_str());
+	// tries to convert file if it is a modified upx
+	if (unscramble) {
+		UpxUnscrambler * unsc = new UpxUnscrambler(_filename.c_str());
+		unsc->unscramble();
+		// redefine the file to convert
+		tempFile = _filename + "-temp";
+		unsc->generate(tempFile.c_str());
+		delete unsc;
+	}
+
+	// generating default name if output is empty
+	if (output.empty())
+		output = _filename + UNPACKED_SUFFIX;
+
+	// unpacking file
+	std::string command = "upx -d " + tempFile + " -o " + output;
+	system(command.c_str());
+
+	if (unscramble) {
+		std::string remove = "rm " + tempFile;
+		system(remove.c_str());
 	}
 }
+

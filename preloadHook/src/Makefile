@@ -1,22 +1,22 @@
 
-CC=gcc
-CFLAGS=-fPIC -shared -ldl
+CC=g++
+CFLAGS=
 LDFLAGS=
-EXEC=virusChecker.so
+EXEC=testUnpacker
 
 #all: $(EXEC)
 
-$(EXEC): fileCounter.o virusChecker.o
-	$(CC) virusChecker.o fileCounter.o -o virusCheckerLib.so $(CFLAGS)
+$(EXEC): testUnpacker.o unpacker.o
+	$(CC) testUnpacker.o unpacker.o -o testUnpacker $(CFLAGS)
 
 
 #	$(CC) -o test3 fileCounter.o virusChecker.o $(LDFLAGS)
 
-fileCounter.o: fileCounter.c
-	$(CC) -o fileCounter.o -c fileCounter.c $(CFLAGS)
+testUnpacker.o: testUnpacker.cpp unpacker.h
+	$(CC) -o testUnpacker.o -c testUnpacker.cpp $(CFLAGS)
 
-virusChecker.o: virusChecker.c fileCounter.h
-	$(CC) -o virusChecker.o -c virusChecker.c $(CFLAGS)
+unpacker.o: unpacker.cpp 
+	$(CC) -o unpacker.o -c unpacker.cpp $(CFLAGS)
 
 clean:
 	rm -rf *.o

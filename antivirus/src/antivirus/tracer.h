@@ -1,5 +1,5 @@
 #ifndef __ANTIVIR_TRACER_H__
-#define __ATTIVIR_TRACER_H__
+#define __ANTIVIR_TRACER_H__
 
 #include <exception>
 #include <string>
@@ -51,7 +51,7 @@ namespace antivirus
 			static std::vector<std::string> read_string_array_at(long addr, pid_t pid) throw(TracerException);
 
 		private:
-			std::map<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;
+			std::multimap<std::string, ANTIVIR_TRACER_HANDLER> _handler_mapping;
 			std::set<pid_t> _traced_process;
 
 			Tracer();

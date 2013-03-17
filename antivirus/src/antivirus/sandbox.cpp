@@ -119,6 +119,7 @@ namespace antivirus
 		the_tracer->add_handler("access",  _stat_access_and_open_handler);
 		the_tracer->add_handler("open",    _stat_access_and_open_handler);
 		the_tracer->add_handler("stat",    _stat_access_and_open_handler);
+		the_tracer->add_handler("stat64",  _stat_access_and_open_handler);
 	}
 
 	/**
@@ -308,7 +309,7 @@ namespace antivirus
 	* @return Full path
 	* @throw SandBoxException If the command cannot be stated.
 	*/
-	std::string SandBox::_get_command_location(const std::string& cmd) throw(SandBoxException)
+	std::string SandBox::get_command_location(const std::string& cmd) throw(SandBoxException)
 	{
 		// Test the string is valid
 		if(cmd.size() <= 0)
@@ -377,7 +378,7 @@ namespace antivirus
 
 		// Get values depending on arch.
 		#ifdef __i386__
-			cmd_addr = regs.edx;
+			cmd_addr = regs.ebx;
 			params_addr = regs.ecx;
 		#else
 			cmd_addr = regs.rdi;
@@ -399,7 +400,7 @@ namespace antivirus
 
 		try
 		{
-			std::string full_path = _get_command_location(buffer);	
+			std::string full_path = get_command_location(buffer);	
 			TRACE(full_path);
 			_current_instance->prepare(full_path);
 
@@ -457,7 +458,7 @@ namespace antivirus
 				{
 					try
 					{
-						full_path = _get_command_location(*it);
+						full_path = get_command_location(*it);
 					}
 					catch( SandBoxException ex )
 					{
@@ -503,7 +504,7 @@ namespace antivirus
 
                 // Get values depending on arch.
                 #ifdef __i386__
-                        file_addr = regs.edx;
+                        file_addr = regs.ebx;
                 #else
                         file_addr = regs.rdi;
                 #endif

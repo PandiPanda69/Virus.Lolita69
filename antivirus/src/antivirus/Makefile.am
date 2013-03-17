@@ -8,4 +8,6 @@ __top_builddir__bin_antivirus_SOURCES= \
 	filedata.cpp filedata.h \
 	zipreader.cpp zipreader.h \
 	sandbox.cpp sandbox.h \
-	syscall.cpp tracer.cpp tracer.h 
+	syscall.cpp tracer.cpp tracer.h \
+	commandrunner.cpp commandrunner.h \
+	descriptortracer.cpp descriptortracer.h

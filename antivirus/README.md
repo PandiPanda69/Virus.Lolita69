@@ -91,7 +91,11 @@ Compilation
 To compile the whole project and the tools, you have to run the `./configure` script.
 Take care to install, if not already done, these libraries:
 - libzip-dev
-- libboost-regex1.42-dev
+- libboost-regex-dev
+- libboost-system-dev
+- libboost-filesystem-dev
+
+(it has been proven to work with version 1.42 of Boost libraries, you can try with higher versions)
 
 Then you can run `make` and it should build the antivirus into `bin/antivirus_packed`.
 

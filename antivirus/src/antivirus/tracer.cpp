@@ -142,17 +142,23 @@ namespace antivirus
 			return true;
 		}
 
-		// Get associated handler
-		std::map<std::string, ANTIVIR_TRACER_HANDLER>::iterator it = _handler_mapping.find( syscall_names[syscall_number] );
-		if(it != _handler_mapping.end())
+		// Get associated handlers
+		std::pair<std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator, std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator> handlers_it;
+
+		handlers_it = _handler_mapping.equal_range( syscall_names[syscall_number] );
+
+		// Then, execute them all
+		bool result = true;
+		std::multimap<std::string, ANTIVIR_TRACER_HANDLER>::iterator it;
+		for(it = handlers_it.first; it != handlers_it.second && result == true; it++)
 		{
 			struct user_regs_struct regs;
 
 			ptrace((__ptrace_request) PTRACE_GETREGS, pid, NULL, &regs);
-			return ((*it).second)(pid, regs);
+			result = ((*it).second)(pid, regs);
 		}
 
-		return true;
+		return result;
 	}
 
 	/**
@@ -264,7 +270,7 @@ namespace antivirus
 			c = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
 
 			// If no error, append character to the string
-			if( c >= 0 )
+			if( c != 0 && c != -1 )
 			{
 				buffer[offset] = c;
 				offset++;

@@ -2,8 +2,11 @@
 #define __ANTIVIR_CORE_H__
 
 #include <string>
+ 
 #include "database.h"
 #include "filedata.h"
+
+#define ANTIVIR_SANDBOX_DIR	"./sandbox"
 
 namespace antivirus
 {
@@ -31,6 +34,9 @@ namespace antivirus
 			Database _database;
 
 			bool _check_signatures(FileData* data);
+
+			E_RETURN_CODE _dynamic_check_by_hijacking(const std::string& filename);
+			E_RETURN_CODE _dynamic_check_by_tracing(const std::string& filename);
 	};
 }
 

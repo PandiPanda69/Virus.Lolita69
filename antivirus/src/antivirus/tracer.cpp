@@ -306,7 +306,7 @@ namespace antivirus
 		{
 			next_addr = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
 
-			if(next_addr > 0)
+			if(next_addr > 0 || next_addr < 0xff000000)
 			{
 				Tracer::read_string_at(next_addr, buffer, MAX_BUFFER_SIZE, pid);
 

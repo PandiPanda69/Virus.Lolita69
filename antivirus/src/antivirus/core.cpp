@@ -1,4 +1,5 @@
 #include <signal.h>
+#include <cstdlib>
 
 #include "core.h"
 #include "filereader.h"
@@ -209,7 +210,7 @@ namespace antivirus
 				execve(param[0], param, environ);
 			}
 
-			throw exception();
+			exit(-1);
 		}
 
 		// Initialize malicious program detection

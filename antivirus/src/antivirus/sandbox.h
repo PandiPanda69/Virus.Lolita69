@@ -19,7 +19,7 @@ namespace antivirus
 
 			SandBoxException(const std::string& msg) throw() : _msg(msg) { }
 
-			std::string& what() throw() { return _msg; }
+			const char* what() const throw() { return _msg.c_str(); }
 
 		private:
 			std::string _msg;

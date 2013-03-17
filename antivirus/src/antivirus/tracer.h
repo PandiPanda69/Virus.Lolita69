@@ -10,6 +10,7 @@
 #define MAX_BUFFER_SIZE	4096
 
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
+#define ANTIVIR_CHILD_EXEC_FAILED_CODE	42
 
 struct user_regs_struct;
 
@@ -26,7 +27,7 @@ namespace antivirus
 
 			TracerException(std::string msg) throw() : _msg(msg)  { }
 
-			std::string& what() throw() { return _msg; }
+			const char* what() const throw() { return _msg.c_str(); }
 
 		private:
 			std::string _msg;

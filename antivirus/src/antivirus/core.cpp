@@ -154,7 +154,7 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::_dynamic_check_by_hijacking(const std::string& filename)
 	{
-		
+		// TODO
 
 		return E_FAILED;
 	}
@@ -210,7 +210,7 @@ namespace antivirus
 				execve(param[0], param, environ);
 			}
 
-			exit(-1);
+			exit(ANTIVIR_CHILD_EXEC_FAILED_CODE);
 		}
 
 		// Initialize malicious program detection

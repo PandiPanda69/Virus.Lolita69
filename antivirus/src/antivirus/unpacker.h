@@ -11,6 +11,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "upxUnscrambler.h"
+
 
 #ifndef UNPACKER_H_
 #define UNPACKER_H_
@@ -41,8 +43,10 @@ namespace antivirus {
 			 * 		will unpack in.
 			 * 		If output is empty, the generated file is
 			 * 		_filename + UNPACKED_SUFFIX.
+			 * @param unscramble: define whether the execute will make sure
+			 * that the file is an upx file or not.
 			 */
-			void execute(std::string output);
+			void execute(std::string output, bool unscrambled = false);
 	};
 }
 #endif /* UNPACKER_H_ */

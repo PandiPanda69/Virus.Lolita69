@@ -174,6 +174,10 @@ namespace antivirus
 		// Initialize handler to trace descriptors
 		DescriptorTracer::initialize_descriptor_tracer();	
 
+		// Initializes pipes to redirect stdin, stdout and stderr
+		int pipe_fd[2];
+		pipe(pipe_fd);
+
 		// Fork processes, one that runs the sandboxed process, other that traces execution
 		pid_t pid = fork();
 		if( pid == 0 )
@@ -185,6 +189,10 @@ namespace antivirus
 			// Prepare sandbox & tracer
 			sandbox.run();
 			Tracer::get_instance()->trace_me();
+
+			dup2(pipe_fd[0], fileno(stdin));
+			dup2(pipe_fd[1], fileno(stdout));
+			dup2(pipe_fd[1], fileno(stderr));
 
 			// Synchronize with parent :-)
 			kill(getpid(), SIGSTOP);
@@ -209,6 +217,9 @@ namespace antivirus
 
 		// Trace program execution
 		Tracer::get_instance()->trace_it(pid);
+
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
 
 		// Is the program malicious then?
 		if( DynamicDetection::get_instance()->is_malicious() == true )

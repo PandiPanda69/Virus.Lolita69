@@ -25,6 +25,7 @@ namespace antivirus
 {
 	// Application name
 	string APP_NAME;
+	string TARGET_NAME;
 
 	/**
 	* Display how to use the app
@@ -82,7 +83,8 @@ int main(int argc, char** argv)
 		return E_USAGE;
 	}
 
-	antivirus::APP_NAME = argv[0];
+	antivirus::APP_NAME    = argv[0];
+	antivirus::TARGET_NAME = argv[1];
 
 	// Change the process name not to be recognized by viruses.
 	antivirus::change_process_name(argv[0]);

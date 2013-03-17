@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "sandbox.h"
 #include "tracer.h"
@@ -70,8 +71,8 @@ namespace antivirus
 	*/
 	void SandBox::run() throw(SandBoxException)
 	{
-		// Copy target 
-		_copy_file_and_create_subdirs(_target);
+		// Copy target and add execute flag :-)
+		_copy_file_and_create_subdirs(_target, true);
 
 		// Sandboxing
 		if( chroot( _path.c_str() ) != 0 )
@@ -267,7 +268,7 @@ namespace antivirus
 	* Copy a file, creating subdirs
 	* @param src Source file
 	*/
-	void SandBox::_copy_file_and_create_subdirs(const std::string& src) const
+	void SandBox::_copy_file_and_create_subdirs(const std::string& src, bool _add_execute_flag) const
 	{
 		std::string dest;
 
@@ -299,6 +300,9 @@ namespace antivirus
 			{
 				TRACE("Copying " << dest);
 				filesystem::copy_file(src, dest);
+
+				if(_add_execute_flag)
+					chmod(dest.c_str(), 0777);
 			}
 		}
 	}

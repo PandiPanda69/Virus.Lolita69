@@ -26,17 +26,22 @@ namespace antivirus
 
 		private:
 			std::map<syscall_name, std::map<filename, std::string> > _malicious_actions;
-			std::map<filename, std::string> _written_content;
+			std::map<pid_t, std::map<filename, std::string> > _written_content;
+			std::map<filename, int> _base_offset;
 			std::map<filename, int> _content_offset;
 
 			bool _is_malicious;
 
 			DynamicDetection();
 
-			bool _check_if_action_is_malicious(syscall_name syscall, filename file);
-			void _stash_new_output(filename file, std::string output);
+			bool _check_if_action_is_malicious(pid_t pid, syscall_name syscall, filename file);
+			void _stash_new_output(pid_t pid, filename file, const std::string& output);
 
 			void _change_pointer_position(filename file, int new_offset);
+
+			bool _does_it_match(const std::string& str1, const std::string& str2) const;
+
+			static size_t _custom_read_string_at(long addr, char* buffer, size_t len, pid_t pid);
 
 			static bool _write_handler(pid_t pid, struct user_regs_struct& regs);
 			static bool _lseek_handler(pid_t pid, struct user_regs_struct& regs);

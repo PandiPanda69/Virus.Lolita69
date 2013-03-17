@@ -97,6 +97,10 @@ namespace antivirus
 			// Check if the signal tells us children exited or whatever
 			if(WIFEXITED(status) || WIFSIGNALED(status) || !WIFSTOPPED(status) )
 			{
+				// Special error when command cannot be runned.
+				if(WEXITSTATUS(status) == ANTIVIR_CHILD_EXEC_FAILED_CODE)
+					throw TracerException("Cannot run command for dynamic check.");
+
 				// Remove current child from traced process and, if there are no left, exit.
 				_traced_process.erase(child);
 
@@ -306,7 +310,7 @@ namespace antivirus
 		{
 			next_addr = ptrace(PTRACE_PEEKDATA, pid, addr + offset, NULL);
 
-			if(next_addr > 0)
+			if(next_addr > 0 || next_addr < 0xff000000)
 			{
 				Tracer::read_string_at(next_addr, buffer, MAX_BUFFER_SIZE, pid);
 

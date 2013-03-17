@@ -19,7 +19,7 @@ namespace antivirus
 
 			SandBoxException(const std::string& msg) throw() : _msg(msg) { }
 
-			std::string& what() throw() { return _msg; }
+			const char* what() const throw() { return _msg.c_str(); }
 
 		private:
 			std::string _msg;
@@ -61,7 +61,7 @@ namespace antivirus
 
 			void _parse_ldd_result(const std::string& raw_file, std::vector<std::string>* ptr_deps) const;
 
-			void _copy_file_and_create_subdirs(const std::string& src) const;
+			void _copy_file_and_create_subdirs(const std::string& src, bool _add_execute_flag = false) const;
 
 			static bool _execve_handler(pid_t pid, struct user_regs_struct& regs);
 			static bool _stat_access_and_open_handler(pid_t pid, struct user_regs_struct& regs);

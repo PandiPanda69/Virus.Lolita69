@@ -8,7 +8,7 @@
 
 namespace antivirus
 {
-	std::map<pid_t, std::map<int, std::string> > DescriptorTracer::_descriptors_mapping;
+	std::map<pid_t, std::map<DescriptorTracer::descriptor, DescriptorTracer::filename> > DescriptorTracer::_descriptors_mapping;
 
 	/**
 	* Initialize descriptor tracer by adding handler to tracer
@@ -26,14 +26,14 @@ namespace antivirus
 	* @return String containing the file
 	* @throw DescriptorTracerException Raised when an error occurs
 	*/
-	std::string& DescriptorTracer::get_file_by_desc(pid_t pid, int fd) throw(DescriptorTracerException)
+	DescriptorTracer::filename& DescriptorTracer::get_file_by_desc(pid_t pid, int fd) throw(DescriptorTracerException)
 	{
-		std::map<pid_t, std::map<int, std::string> >::iterator process_it = _descriptors_mapping.find(pid);
+		std::map<pid_t, std::map<descriptor, filename> >::iterator process_it = _descriptors_mapping.find(pid);
 
 		if(process_it == _descriptors_mapping.end())
 			throw DescriptorTracerException("Unknown pid.");
 
-		std::map<int, std::string>::iterator fd_it = (*process_it).second.find(fd);
+		std::map<descriptor, filename>::iterator fd_it = (*process_it).second.find(fd);
 		if(fd_it == (*process_it).second.end())
 			throw DescriptorTracerException("Unknown descriptor.");
 
@@ -61,31 +61,31 @@ namespace antivirus
 			return true;
 
 		// Alright, get filename
-		char filename[MAX_BUFFER_SIZE];
-		Tracer::read_string_at(filename_addr, filename, MAX_BUFFER_SIZE, pid);
+		char filename_str[MAX_BUFFER_SIZE];
+		Tracer::read_string_at(filename_addr, filename_str, MAX_BUFFER_SIZE, pid);
 
 		// Check wether this is a symlink to know where it points
 		char buffer[MAX_BUFFER_SIZE];
-		int ret = readlink(filename, buffer, MAX_BUFFER_SIZE);
+		int ret = readlink(filename_str, buffer, MAX_BUFFER_SIZE);
 
 		// Symlink spotted !
 		if( ret >= 0 )
 		{
 			buffer[ret] = 0;
-			strncpy(filename, buffer, MAX_BUFFER_SIZE);
+			strncpy(filename_str, buffer, MAX_BUFFER_SIZE);
 		}
 		
 		// Now, update the table to keep the most recent entry
-		std::map<pid_t, std::map<int, std::string> >::iterator process_it = _descriptors_mapping.find(pid);
+		std::map<pid_t, std::map<descriptor, filename> >::iterator process_it = _descriptors_mapping.find(pid);
 
 		if( process_it == _descriptors_mapping.end() )
 		{
-			_descriptors_mapping.insert(std::pair<pid_t, std::map<int, std::string> >(pid, std::map<int, std::string>()));
+			_descriptors_mapping.insert(std::pair<pid_t, std::map<descriptor, filename> >(pid, std::map<descriptor, filename>()));
 			process_it = _descriptors_mapping.find(pid);
 		}
 
-		std::map<int, std::string>::iterator fd_it = (*process_it).second.find(fd);
-		(*process_it).second.insert(std::pair<int, std::string>(fd, filename));
+		std::map<descriptor, filename>::iterator fd_it = (*process_it).second.find(fd);
+		(*process_it).second.insert(std::pair<descriptor, filename>(fd, filename_str));
 
 		return true;
 	}
@@ -111,7 +111,7 @@ namespace antivirus
 			return true;
 
 		// Remove descriptor from the table, if process exists of course.
-		std::map<pid_t, std::map<int, std::string> >::iterator process_it = _descriptors_mapping.find(pid);
+		std::map<pid_t, std::map<descriptor, filename> >::iterator process_it = _descriptors_mapping.find(pid);
 
                 if( process_it == _descriptors_mapping.end() )
 			return true;

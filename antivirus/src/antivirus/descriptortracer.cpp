@@ -82,6 +82,11 @@ namespace antivirus
 		{
 			_descriptors_mapping.insert(std::pair<pid_t, std::map<descriptor, filename> >(pid, std::map<descriptor, filename>()));
 			process_it = _descriptors_mapping.find(pid);
+
+			// Process initialization, add i/o/e descriptors...
+			(*process_it).second.insert(std::pair<descriptor, filename>(0, "stdin"));
+			(*process_it).second.insert(std::pair<descriptor, filename>(1, "stdout"));
+			(*process_it).second.insert(std::pair<descriptor, filename>(2, "stderr"));
 		}
 
 		std::map<descriptor, filename>::iterator fd_it = (*process_it).second.find(fd);

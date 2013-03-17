@@ -47,7 +47,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am___top_builddir__bin_antivirus_OBJECTS = main.$(OBJEXT) \
 	core.$(OBJEXT) database.$(OBJEXT) filereader.$(OBJEXT) \
 	filedata.$(OBJEXT) zipreader.$(OBJEXT) sandbox.$(OBJEXT) \
-	syscall.$(OBJEXT) tracer.$(OBJEXT)
+	syscall.$(OBJEXT) tracer.$(OBJEXT) commandrunner.$(OBJEXT) \
+	descriptortracer.$(OBJEXT)
 __top_builddir__bin_antivirus_OBJECTS =  \
 	$(am___top_builddir__bin_antivirus_OBJECTS)
 __top_builddir__bin_antivirus_LDADD = $(LDADD)
@@ -168,7 +169,9 @@ __top_builddir__bin_antivirus_SOURCES = \
 	filedata.cpp filedata.h \
 	zipreader.cpp zipreader.h \
 	sandbox.cpp sandbox.h \
-	syscall.cpp tracer.cpp tracer.h 
+	syscall.cpp tracer.cpp tracer.h \
+	commandrunner.cpp commandrunner.h \
+	descriptortracer.cpp descriptortracer.h
 
 all: all-am
 
@@ -254,8 +257,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commandrunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/database.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/descriptortracer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filedata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filereader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@

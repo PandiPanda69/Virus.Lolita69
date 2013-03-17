@@ -10,4 +10,5 @@ __top_builddir__bin_antivirus_SOURCES= \
 	sandbox.cpp sandbox.h \
 	syscall.cpp tracer.cpp tracer.h \
 	commandrunner.cpp commandrunner.h \
-	descriptortracer.cpp descriptortracer.h
+	descriptortracer.cpp descriptortracer.h \
+	dynamicdetection.cpp dynamicdetection.h

@@ -7,6 +7,7 @@
 #include "sandbox.h"
 #include "commandrunner.h"
 #include "descriptortracer.h"
+#include "dynamicdetection.h"
 
 #include "debug.h"
 
@@ -118,9 +119,7 @@ namespace antivirus
 	*/
 	Core::E_RETURN_CODE Core::perform_dynamic_check(const std::string& filename)
 	{
-		_dynamic_check_by_tracing(filename);
-
-		return E_FAILED;
+		return _dynamic_check_by_tracing(filename);
 	}
 
 	/**
@@ -173,7 +172,7 @@ namespace antivirus
 		sandbox.initialize_tracer();
 
 		// Initialize handler to trace descriptors
-		DescriptorTracer::initialize_descriptor_tracer();
+		DescriptorTracer::initialize_descriptor_tracer();	
 
 		// Fork processes, one that runs the sandboxed process, other that traces execution
 		pid_t pid = fork();
@@ -205,8 +204,16 @@ namespace antivirus
 			throw exception();
 		}
 
+		// Initialize malicious program detection
+		DynamicDetection::get_instance()->initialize();
+
+		// Trace program execution
 		Tracer::get_instance()->trace_it(pid);
 
-		return E_FAILED;
+		// Is the program malicious then?
+		if( DynamicDetection::get_instance()->is_malicious() == true )
+			return E_VIRUS_SPOTTED;
+
+		return E_LOOKS_CLEAN;
 	}
 }

@@ -110,15 +110,21 @@ int main(int argc, char** argv)
 	else
 		core = new antivirus::Core;
 
-	res = core->perform_static_check(argv[1]);
-	ret = print_check_result(res);
-
-	// If the file has not been statically detected as suspicious, performs a dynamic check.
-	if( ret != E_VIRUS )
+	try
 	{
 		res = core->perform_dynamic_check(argv[1]);
-		ret = print_check_result(res);
 	}
+	catch(...)
+	{
+		res = antivirus::Core::E_FAILED;
+	}
+
+	// If the file has not been statically detected as suspicious, performs a dynamic check.
+	if( res == antivirus::Core::E_FAILED )
+	{
+		res = core->perform_static_check(argv[1]);
+	}
+	ret = print_check_result(res);
 
 	// Release memory
 	delete core;

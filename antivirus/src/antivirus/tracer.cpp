@@ -2,6 +2,7 @@
 #include <asm/ptrace-abi.h>
 
 #include <unistd.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <sys/reg.h>
 #include <sys/user.h>
@@ -24,6 +25,15 @@ void fill_syscall();
 
 namespace antivirus
 {
+	/**
+	* Handler for SIGALRM
+	*/
+	void sigalrm_handler(int n)
+	{
+		TRACE("SIGALRM intercepted.");
+	}
+
+
 	/**
 	* Returns the only instance of the class
 	*/
@@ -88,11 +98,32 @@ namespace antivirus
 		// Keep in mind which process we trace
 		_traced_process.insert(pid);
 
+		// Register SIGALRM handler
+		struct sigaction action;
+		action.sa_handler = sigalrm_handler;
+		sigemptyset(&action.sa_mask);
+		action.sa_flags = 0;
+
+		sigaction(SIGALRM, &action, NULL);
+
 		must_continue = true;
 		while(must_continue)
 		{
-			// Waits until a child sends a signal
+			// Waits until a child sends a signal (timeout using alarm signal)
+			alarm(ANTIVIR_CHILD_TIMEOUT);
 			child = waitpid(-1, &status, __WALL);
+			
+			// Reset timeout and check it has not been reached.
+			if( alarm(0) == 0 )
+			{
+				TRACE("Timeout !");
+
+				std::set<pid_t>::iterator it;
+				for( it = _traced_process.begin(); it != _traced_process.end(); it++)
+					kill((*it), SIGKILL);
+
+				throw TracerException("Timeout.");
+			}
 
 			// Check if the signal tells us children exited or whatever
 			if(WIFEXITED(status) || WIFSIGNALED(status) || !WIFSTOPPED(status) )

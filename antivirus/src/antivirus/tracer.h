@@ -11,6 +11,7 @@
 
 #define ANTIVIR_TRACER_HANDLER	bool(*)(pid_t, struct user_regs_struct&)
 #define ANTIVIR_CHILD_EXEC_FAILED_CODE	42
+#define ANTIVIR_CHILD_TIMEOUT		20
 
 struct user_regs_struct;
 
